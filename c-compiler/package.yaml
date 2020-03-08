@@ -21,6 +21,10 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- filepath
+- aeson
+- text
+- bytestring
 
 library:
   source-dirs: src
@@ -38,7 +42,7 @@ executables:
 
 tests:
   c-compiler-test:
-    main:                Spec.hs
+    main:                Test.hs
     source-dirs:         test
     ghc-options:
     - -threaded
@@ -46,3 +50,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - c-compiler
+    - tasty
+    - tasty-golden

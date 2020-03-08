@@ -1,6 +1,31 @@
-module Main where
+module Main (main, savePreprocessed) where
 
-import Lib
+import System.Environment
+
+import Compiler
 
 main :: IO ()
-main = someFunc
+main = do
+        args <- getArgs
+        preprocessed_code <- compile (head args)
+        putStrLn (preprocessed_code)
+
+---------------------------------------------------------------------------------------------------
+data CompilerParams = CompilerParams { input_file_path     :: String
+                                     , output_preprocessed :: Bool
+                                     }
+
+processArgs :: [String] -> CompilerParams
+processArgs args = processFlags unset_params flags
+    where
+        (input_file_path:flags) = args
+
+        unset_params = CompilerParams input_file_path False
+
+        processFlags :: CompilerParams -> [String] -> CompilerParams
+        processFlags params []         = params
+        processFlags params (arg:args) = case arg of 
+                                            "-p"      -> (CompilerParams orig_input_file_path True)
+                                            otherwise -> error ("Unrecognized flag passed: \"" ++ arg ++ "\"")
+            where
+                (CompilerParams orig_input_file_path orig_output_preprocessed) = params
