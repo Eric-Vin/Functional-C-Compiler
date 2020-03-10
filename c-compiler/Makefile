@@ -5,7 +5,7 @@ EXE   = c-compiler-exe
 
 .SILENT:
 
-all: clean_test build test
+all: build test
 
 build:
 	$(STACK) build
@@ -23,4 +23,4 @@ purge: clean_test
 	$(STACK) purge
 
 clean_test:
-	rm -rf test/output_files/*
+	find test/output_files ! -type d -delete

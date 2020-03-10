@@ -1,5 +1,5 @@
 #ifndef NUMBER
-	#define NUMBER "Output"
+	#define NUMBER 1
 #endif
 
 int main() {

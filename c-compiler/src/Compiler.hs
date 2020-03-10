@@ -12,7 +12,7 @@ compile file_path = preprocess file_path
 savePreprocessed :: FilePath -> IO ()
 savePreprocessed input_file_path = do
                                     preprocessed_code <- preprocess input_file_path
-                                    writeFile outputFilePath preprocessed_code
+                                    writeFile (traceShowId outputFilePath) preprocessed_code
     where
         outputFilePath    = if take 17 input_file_path == "test/input_files/"
                  then

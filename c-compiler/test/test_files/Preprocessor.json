@@ -1,3 +1,9 @@
-{
-
-}
+[
+	{
+	"Name"   : "Define",
+	"Input"  : "test/input_files/preprocessor/preprocessor_define.c",
+	"Output" : "test/output_files/preprocessor/preprocessor_define.pp",
+	"Golden" : "test/golden_files/preprocessor/preprocessor_define.pp",
+	"Type"   : "Preprocessor"
+	}
+]
