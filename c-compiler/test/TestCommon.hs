@@ -2,7 +2,8 @@
 module TestCommon where 
 
 import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.Golden (goldenVsFile, findByExtension)
+import Test.Tasty.Golden (goldenVsFile, goldenVsString, findByExtension)
+import Test.Tasty.ExpectedFailure
 
 import System.FilePath (takeBaseName)
 
@@ -30,6 +31,7 @@ data Test      =       Test {
                             , testOutputPath   :: FilePath
                             , testGoldenPath   :: FilePath
                             , testType         :: TestType
+                            , testError        :: Bool
                             }
 
 data TestType = Preprocessor | Output
@@ -51,7 +53,29 @@ generateTestGroup test_group = testGroup (testGroupName test_group) test_tree
 
 --Generates a TestTree from a Test
 generateTests :: Test -> TestTree
-generateTests test = (goldenVsFile (testName test) (testGoldenPath test) (testOutputPath test) (savePreprocessed (testInputPath test)))
+generateTests test    = case (testError test) of
+                            True  -> generateErrorTest test
+                            False -> generateNormalTest test
+
+generateNormalTest :: Test -> TestTree
+generateNormalTest test   = case (testType test) of
+                                Preprocessor -> (goldenVsFile test_name golden_path output_path (savePreprocessed input_path output_path))
+                                otherwise    -> error "Unsupported TestType"
+                            where
+                                test_name   = testName test
+                                input_path  = testInputPath test
+                                golden_path = testGoldenPath test
+                                output_path = testOutputPath test
+
+generateErrorTest :: Test -> TestTree
+generateErrorTest test    = case (testType test) of
+                                Preprocessor -> expectFail (goldenVsString test_name golden_path  (errorTestFunctionWrapper input_path output_path savePreprocessed))
+                                otherwise    -> error "Unsupported TestType"
+                            where
+                                test_name   = testName test
+                                input_path  = testInputPath test
+                                golden_path = "test/golden/error/error.err"
+                                output_path = testOutputPath test
 
 ---------------------------------------------------------------------------------------------------
 --Functions for parsing test/test_files/ for all test file JSONS
@@ -91,5 +115,27 @@ instance FromJSON Test where
     let testType = case stringTestType of
                         "Preprocessor" -> Preprocessor
                         "Output"       -> Output
-                        otherwise      -> error "Invalid test file"
+                        otherwise      -> error "Invalid testType value"
+
+    errorTestType   <- o .: pack "Error"
+
+    let testError = case errorTestType of
+                        "True"         -> True
+                        "False"        -> False
+                        otherwise      -> error "Invalid testError value"
+
     return Test{..}
+
+---------------------------------------------------------------------------------------------------
+--Error Test Functions
+---------------------------------------------------------------------------------------------------
+-- | Takes an input path, an output path and a test function that takes those two paramaters and
+-- | runs the function. Then returns error_code loaded from the test error file. This is used to 
+-- | trigger errors.
+errorTestFunctionWrapper :: FilePath -> FilePath -> (FilePath -> FilePath -> IO ()) -> IO B.ByteString
+errorTestFunctionWrapper in_path out_path test_func =   do
+                                                            test_func in_path out_path                              -- Runs the test function
+
+                                                            error_code <- B.readFile "test/golden/error/error.err"  -- Loads the test error file 
+
+                                                            return error_code

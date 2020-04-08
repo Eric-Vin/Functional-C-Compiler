@@ -25,6 +25,8 @@ dependencies:
 - aeson
 - text
 - bytestring
+- split
+- regex-tdfa
 
 library:
   source-dirs: src
@@ -52,3 +54,4 @@ tests:
     - c-compiler
     - tasty
     - tasty-golden
+    - tasty-expected-failure

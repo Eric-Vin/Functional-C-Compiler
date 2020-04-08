@@ -11,6 +11,8 @@ main = do
         putStrLn (preprocessed_code)
 
 ---------------------------------------------------------------------------------------------------
+--Command Line Argument Processing Functions and Datatypes
+---------------------------------------------------------------------------------------------------
 data CompilerParams = CompilerParams { input_file_path     :: String
                                      , output_preprocessed :: Bool
                                      }
