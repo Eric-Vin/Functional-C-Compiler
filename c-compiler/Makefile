@@ -13,7 +13,7 @@ build:
 exec: build
 	$(STACK) exec $(EXE) $(target)
 
-test: build
+test: build test_directories
 	$(STACK) test --test-arguments="--timeout=5 --num-threads 1"
 
 clean: clean_test
@@ -23,4 +23,8 @@ purge: clean_test
 	$(STACK) purge
 
 clean_test:
-	find test/output ! -type d -delete
+	rm -rf test/output
+
+test_directories:
+	mkdir -p test/output
+	mkdir -p test/output/preprocessor

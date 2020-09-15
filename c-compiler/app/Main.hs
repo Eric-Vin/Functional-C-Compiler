@@ -7,8 +7,8 @@ import Compiler
 main :: IO ()
 main = do
         args <- getArgs
-        preprocessed_code <- compile (head args)
-        putStrLn (preprocessed_code)
+        compiled_code <- compile (head args)
+        putStrLn compiled_code
 
 ---------------------------------------------------------------------------------------------------
 --Command Line Argument Processing Functions and Datatypes
@@ -27,7 +27,7 @@ processArgs args = processFlags unset_params flags
         processFlags :: CompilerParams -> [String] -> CompilerParams
         processFlags params []         = params
         processFlags params (arg:args) = case arg of 
-                                            "-p"      -> (CompilerParams orig_input_file_path True)
+                                            "-p"      -> (CompilerParams input_file_path True)
                                             otherwise -> error ("Unrecognized flag passed: \"" ++ arg ++ "\"")
             where
                 (CompilerParams orig_input_file_path orig_output_preprocessed) = params
