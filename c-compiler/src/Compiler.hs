@@ -1,7 +1,5 @@
 module Compiler (compile, savePreprocessed) where
 
-import System.FilePath (takeBaseName, replaceExtension, splitPath, joinPath, hasTrailingPathSeparator)
-
 import Debug.Trace
 
 import Preprocessor.Preprocessor

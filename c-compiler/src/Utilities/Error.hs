@@ -1,5 +1,6 @@
-module Error where
+module Utilities.Error where
 
-data CompilerError  = PreprocessorError SourceTracker String 
-                    | LexerError SourceTracker String
-                    | ParserError SourceTracker String
+data CompilerError  = PreprocessorError String 
+                    | LexerError String
+                    | ParserError String
+                    deriving (Show)
