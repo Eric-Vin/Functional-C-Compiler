@@ -3,6 +3,7 @@
 module Preprocessor.Scanner where 
 
 import Control.Applicative
+import Data.Monoid
 import Data.Foldable (asum)
 import Data.Char (isLetter, isDigit, isSpace)
 
@@ -33,14 +34,25 @@ scanPreprocessingNumber  = PreprocessingNumber <$> scan_optional_period
                             exponents_list          = ["e+", "e-", "E+", "E-", "p+", "p-", "P+", "P-"]
                             scan_exponents          = (asum $ map scanString exponents_list)
 
-                            scan_optional_period    = ((++) <$> (tryScanString ".") <*> scan_digit)
-                            scan_digit              = ((++) <$> ((:[]) <$> scanSingle isDigit) <*> (concat <$> many scan_tail))
+                            scan_optional_period    = ((++) <$> (tryScanString ".") <*> scan_mandatory_digit)
+                            scan_mandatory_digit    = ((++) <$> ((:[]) <$> scanSingle isDigit) <*> (concat <$> many scan_tail))
                             scan_tail               = scan_exponents <|> 
                                                       (scanSpan isDigit) <|> (scanSpan isLetter) <|>
                                                       (scanString "_") <|> (scanString ".")
                                                       
 scanStringLiteral :: Scanner PreprocessorToken
-scanStringLiteral  = undefined
+scanStringLiteral   = StringLiteral <$> (scan_single_quote <|> scan_double_quote)
+                    where
+                        scan_single_quote   = scanChar '\'' *>  (concat <$> many scan_single_quote_inner) <* scanChar '\''
+                        scan_double_quote   = scanChar '"'  *> (concat <$> many scan_double_quote_inner) <* scanChar '"'
+
+                        scan_single_quote_inner = (scanString "\\'")   <|> scan_escape_sequences <|> (scanSpan $ getAll . ((All . (/= '\'')) <> (All . (/='\\'))))
+                        scan_double_quote_inner = (scanString "\\\"")  <|> scan_escape_sequences <|> (scanSpan $ getAll . ((All . (/= '"'))  <> (All . (/='\\'))))
+
+                        -- | Covers all escape sequences except the appropriate Char/String delimeter
+                        -- | NOTE: Add support for remaining escape sequences
+                        scan_escape_sequences = (scanString "\\\\")
+
 
 scanPunctuator :: Scanner PreprocessorToken
 scanPunctuator  = undefined
@@ -100,7 +112,7 @@ tryScanString string = Scanner $ \input ->
 scanString :: String -> Scanner String
 scanString string = Scanner $ \input -> 
                         case runScanner (traverse scanChar string) input of
-                            Left _ -> Left $ PreprocessorError $ "Expected '" ++ string ++ "' but got '" ++ (take (length string) input) ++ "'"
+                            Left _ -> Left $ PreprocessorError $ "Expected \"" ++ string ++ "\" but got \"" ++ (take (length string) input) ++ "\""
                             token  -> token
 
 -- | Creates a Scanner that will attempt to scan the passed Char
