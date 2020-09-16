@@ -8,6 +8,7 @@ import Data.Foldable (asum)
 import Data.Char (isLetter, isDigit, isSpace)
 
 import Utilities.Error
+import Utilities.Language (punctuators_list)
 
 import Preprocessor.Common
 
@@ -22,11 +23,18 @@ tokenize input_text = undefined
 scanToken :: Scanner PreprocessorToken
 scanToken = undefined
 
+scanDirective :: Scanner PreprocessorToken
+scanDirective = undefined 
+
+scanPunctuator :: Scanner PreprocessorToken
+scanPunctuator  = Punctuator <$> (asum $ map scanString punctuators_list)
+
 scanIdentifier :: Scanner PreprocessorToken
-scanIdentifier  = Identifier <$> ((:) <$> scan_head_char <*> many scan_tail_char)
+scanIdentifier  = Identifier <$> ((++) <$> scan_head_char <*> (concat <$> many scan_tail_char))
                 where
-                    scan_head_char = (scanSingle isLetter) <|> (scanChar '_')
+                    scan_head_char = (scanSingle isLetter) <|> (scanString "_")
                     scan_tail_char =  scan_head_char <|> (scanSingle isDigit)
+
 
 scanPreprocessingNumber :: Scanner PreprocessorToken
 scanPreprocessingNumber  = PreprocessingNumber <$> scan_optional_period
@@ -34,8 +42,8 @@ scanPreprocessingNumber  = PreprocessingNumber <$> scan_optional_period
                             exponents_list          = ["e+", "e-", "E+", "E-", "p+", "p-", "P+", "P-"]
                             scan_exponents          = (asum $ map scanString exponents_list)
 
-                            scan_optional_period    = ((++) <$> (tryScanString ".") <*> scan_mandatory_digit)
-                            scan_mandatory_digit    = ((++) <$> ((:[]) <$> scanSingle isDigit) <*> (concat <$> many scan_tail))
+                            scan_optional_period    = ((++) <$> (tryScanString ".")  <*> scan_mandatory_digit)
+                            scan_mandatory_digit    = ((++) <$> (scanSingle isDigit) <*> (concat <$> many scan_tail))
                             scan_tail               = scan_exponents <|> 
                                                       (scanSpan isDigit) <|> (scanSpan isLetter) <|>
                                                       (scanString "_") <|> (scanString ".")
@@ -53,16 +61,17 @@ scanStringLiteral   = StringLiteral <$> (scan_single_quote <|> scan_double_quote
                         -- | NOTE: Add support for remaining escape sequences
                         scan_escape_sequences = (scanString "\\\\")
 
-
-scanPunctuator :: Scanner PreprocessorToken
-scanPunctuator  = undefined
-
 scanOther :: Scanner PreprocessorToken
 scanOther  = undefined
 
 ---------------------------------------------------------------------------------------------------
 -- | Scanner Helper Functons
 ---------------------------------------------------------------------------------------------------
+
+-- | Creates a Scanner that will attempt to scan all whitespace characters apart from newline (\n).
+-- | NOTE: This function never returns a Left value, only an empty list.
+tryScanWhitespace :: Scanner String
+scanWhitespace = tryScanSpan ($ getAll . ((All . isSpace) <> (All . (/='\n'))))
 
 -- | Creates a Scanner that will attempt to scan Chars as long as the passed function is satisfied.
 -- | NOTE: This function never returns a Left value, only an empty list.
@@ -80,22 +89,22 @@ scanSpan :: (Char -> Bool) -> Scanner String
 scanSpan f  = Scanner $ scan
             where
                     scan :: String -> Either CompilerError (String, String)
-                    scan input  | length(token) == 0 = Left $ PreprocessorError $ "'" ++ [head input] ++ "' does not fulfill the scan function"
-                                | otherwise = Right (input', token)
+                    scan input  | length(token) == 0    = Left $ PreprocessorError $ "'" ++ [head input] ++ "' does not fulfill the scan function"
+                                | otherwise             = Right (input', token)
                                 where
                                     (token, input') = span f input
 
 -- | Creates a Scanner that will attempt to scan a single Char if it fulfills the function passed. 
 -- | Otherwise returns a Left value.
-scanSingle :: (Char -> Bool) -> Scanner Char
+scanSingle :: (Char -> Bool) -> Scanner String
 scanSingle f  = Scanner $ scan
             where
-                    scan :: String -> Either CompilerError (String, Char)
+                    scan :: String -> Either CompilerError (String, String)
                     scan []    = Left $ PreprocessorError $ "Empty input"
                     scan input = return_value
                                 where
                                     target_char  = head input
-                                    return_value    | f target_char = Right $ (tail input, target_char)
+                                    return_value    | f target_char = Right $ (tail input, [target_char])
                                                     | otherwise     = Left $ PreprocessorError $ "'" ++ [target_char] ++ "' does not fulfill the scan function"
 
 -- | Creates a Scanner that will attempt to scan the passed String.

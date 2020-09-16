@@ -8,9 +8,16 @@ module Preprocessor.Common where
 type PreprocessedFile   = [PreprocessorToken]
 
 -- | Datatype representing one Preprocessor token
-data PreprocessorToken  = Identifier String
+data PreprocessorToken  = Directive PreprocessorDirective
+                        | Punctuator String
+                        | Identifier String
                         | PreprocessingNumber String
                         | StringLiteral String
-                        | Punctuator String
                         | Other String
                         deriving (Show)
+
+-- | Datatype representing a Preprocessor Directive
+data PreprocessorDirective  = Include String
+                            | Define String String
+                            | Undefine String
+                            deriving (Show)

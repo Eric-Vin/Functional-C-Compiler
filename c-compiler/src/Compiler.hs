@@ -5,9 +5,7 @@ import Debug.Trace
 import Preprocessor.Preprocessor
 
 compile :: FilePath -> IO String
-compile file_path = do
-                        preprocessed_code <- preprocess file_path
-                        return (show preprocessed_code)
+compile file_path = undefined
 
 ---------------------------------------------------------------------------------------------------
 --Takes a FilePath pointing to an input ".c" file. Preprocesses the file and saves it to the
