@@ -62,7 +62,7 @@ scanStringLiteral   = StringLiteral <$> (scan_single_quote <|> scan_double_quote
                         scan_escape_sequences = (scanString "\\\\")
 
 scanOther :: Scanner PreprocessorToken
-scanOther  = undefined
+scanOther  = scanSingle (const True)
 
 ---------------------------------------------------------------------------------------------------
 -- | Scanner Helper Functons
