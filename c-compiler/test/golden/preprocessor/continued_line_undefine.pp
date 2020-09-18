@@ -1,3 +1,3 @@
-int main ( ) {
-return DEF ;
-}
+int main ( ) { 
+return DEF ; 
+} 

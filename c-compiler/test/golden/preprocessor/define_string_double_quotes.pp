@@ -1,3 +1,3 @@
-int main ( ) {
-return "this is a string" ;
-}
+int main ( ) { 
+return "this is a string" ; 
+} 

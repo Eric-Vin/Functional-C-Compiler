@@ -1,3 +1,3 @@
-int main ( ) {
-return 87 ;
-}
+int main ( ) { 
+return 87 ; 
+} 

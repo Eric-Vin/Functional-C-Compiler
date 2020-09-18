@@ -121,7 +121,7 @@
     },
     {
     "Name"   : "Include_File_Double_Quotes",
-    "Input"  : "test/input/preprocessor/include_file_double_quotes.c",
+    "Input"  : "test/input/preprocessor/include_file_double_quotes/include_file_double_quotes.c",
     "Output" : "test/output/preprocessor/include_file_double_quotes.pp",
     "Golden" : "test/golden/preprocessor/include_file_double_quotes.pp",
     "Type"   : "Preprocessor",
@@ -137,7 +137,7 @@
     },
     {
     "Name"   : "Include_Space",
-    "Input"  : "test/input/preprocessor/include_space.c",
+    "Input"  : "test/input/preprocessor/include_space/include_space.c",
     "Output" : "test/output/preprocessor/include_space.pp",
     "Golden" : "test/golden/preprocessor/include_space.pp",
     "Type"   : "Preprocessor",
@@ -145,7 +145,7 @@
     },
     {
     "Name"   : "Include_File_Single_Quotes",
-    "Input"  : "test/input/preprocessor/include_file_single_quotes.c",
+    "Input"  : "test/input/preprocessor/include_file_single_quotes/include_file_single_quotes.c",
     "Output" : "test/output/preprocessor/include_file_single_quotes.pp",
     "Golden" : "test/golden/error/error.err",
     "Type"   : "Preprocessor",
@@ -169,7 +169,7 @@
     },
     {
     "Name"   : "Include_Invalid_Wrapper",
-    "Input"  : "test/input/preprocessor/include_invalid_wrapper.c",
+    "Input"  : "test/input/preprocessor/include_invalid_wrapper/include_invalid_wrapper.c",
     "Output" : "test/output/preprocessor/include_invalid_wrapper.pp",
     "Golden" : "test/golden/error/error.err",
     "Type"   : "Preprocessor",
@@ -177,7 +177,7 @@
     },
     {
     "Name"   : "Include_Invalid_Params",
-    "Input"  : "test/input/preprocessor/include_invalid_params.c",
+    "Input"  : "test/input/preprocessor/include_invalid_params/include_invalid_params.c",
     "Output" : "test/output/preprocessor/include_invalid_params.pp",
     "Golden" : "test/golden/error/error.err",
     "Type"   : "Preprocessor",

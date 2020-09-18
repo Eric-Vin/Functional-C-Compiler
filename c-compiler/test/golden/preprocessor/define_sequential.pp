@@ -1,4 +1,4 @@
-int num = NUMBER ;
-int main ( ) {
-return 26 ;
-}
+int num = NUMBER ; 
+int main ( ) { 
+return 26 ; 
+} 

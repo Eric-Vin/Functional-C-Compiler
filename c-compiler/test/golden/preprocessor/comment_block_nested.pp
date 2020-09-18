@@ -1,4 +1,4 @@
-*/
-int main ( ) {
-return 777 ;
-}
+* / 
+int main ( ) { 
+return 777 ; 
+} 

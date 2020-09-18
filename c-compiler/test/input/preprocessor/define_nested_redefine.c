@@ -3,6 +3,6 @@
 #undef MACROONE
 #define MACROONE 231
 
-int main() {
-    return MACROONE;
+int main() { 
+    return MACROONE ;
 }
