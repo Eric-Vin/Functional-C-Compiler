@@ -160,14 +160,6 @@
     "Error"  : "True"
     },
     {
-    "Name"   : "Include_Invalid_Filename",
-    "Input"  : "test/input/preprocessor/include_invalid_filename.c",
-    "Output" : "test/output/preprocessor/include_invalid_filename.pp",
-    "Golden" : "test/golden/error/error.err",
-    "Type"   : "Preprocessor",
-    "Error"  : "True"
-    },
-    {
     "Name"   : "Include_Invalid_Wrapper",
     "Input"  : "test/input/preprocessor/include_invalid_wrapper/include_invalid_wrapper.c",
     "Output" : "test/output/preprocessor/include_invalid_wrapper.pp",

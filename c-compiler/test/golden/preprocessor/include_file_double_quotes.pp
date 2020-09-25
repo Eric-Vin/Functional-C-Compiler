@@ -1,6 +1,6 @@
-int func ( ) {
-return 12 ;
-}
-int main ( ) {
-return 4 ;
-}
+int func ( ) { 
+return 12 ; 
+} 
+int main ( ) { 
+return 4 ; 
+} 

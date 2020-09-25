@@ -6,23 +6,22 @@ import Control.Applicative
 import Data.Monoid
 import Data.Foldable (asum)
 import Data.Char (isLetter, isDigit, isSpace)
+import Data.Either (isLeft, isRight)
 
 import Utilities.Error
 import Utilities.Language (punctuators_list)
 
 import Preprocessor.Common
 
-import Debug.Trace
-
 ---------------------------------------------------------------------------------------------------
 -- | Scanner Main Functons
 ---------------------------------------------------------------------------------------------------
 
 -- | Tokenizes passed string into preprocessor tokens
-tokenize :: String -> PreprocessedFile
+tokenize :: String -> [PreprocessorToken]
 tokenize input = case (runScanner $ many (tryScanInvisibleSpace *> scanToken <* tryScanInvisibleSpace)) input of
                     Left compiler_error -> throwCompilerError compiler_error
-                    Right ("", tokens)  -> PreprocessedFile tokens
+                    Right ("", tokens)  -> tokens
                     Right (input', _)   -> throwCompilerError $ PreprocessorError $ "Not all input parsed, \"" ++ input' ++ "\" remains.)"
 
 scanToken :: Scanner PreprocessorToken
@@ -78,17 +77,28 @@ scanOther  = Other <$> scanSingle (const True)
 -- | Attempts to scan an Include directive.
 -- | If it cannot scan a valid Include directive, returns a left value.
 scanInclude :: Scanner PreprocessorDirective
-scanInclude = Include <$> (scan_directive_type *> tryScanInvisibleSpace *> scan_include_string_literal <* tryScanInvisibleSpace <* scanString "\n")
+scanInclude =   (uncurry Include) <$> (Scanner $ scan)
             where
+                scan :: String -> Either CompilerError (String, (IncludeType, String)) 
+                scan input  =   if (isRight $ runScanner scan_directive_type input) && (isLeft $ runScanner full_directive_scan input)
+                                then
+                                    throwCompilerError $ PreprocessorError "Include directive was of incorrect form"
+                                else
+                                        ((\(x,y) -> (x, (File, y))) <$> runScanner scan_file_include input) 
+                                    <|> ((\(x,y) -> (x, (Library, y))) <$> runScanner scan_lib_include input)
+
                 scan_directive_type = scanString "include"
 
-                scan_include_string_literal = (scan_double_quote <|> scan_angle_brackets)
+                scan_string_inner_quote     = tryScanSpanChar (/= '"') 
+                scan_string_inner_brackets  = tryScanSpanChar (/= '>') 
 
                 scan_double_quote   = scanChar '"'  *> scan_string_inner_quote <* scanChar '"'
                 scan_angle_brackets = scanChar '<'  *> scan_string_inner_brackets <* scanChar '>'
 
-                scan_string_inner_quote     = tryScanSpanChar (/= '"') 
-                scan_string_inner_brackets  = tryScanSpanChar (/= '>') 
+                scan_file_include = scan_directive_type *> tryScanInvisibleSpace *> scan_double_quote <* tryScanInvisibleSpace <* scanString "\n"
+                scan_lib_include = scan_directive_type *> tryScanInvisibleSpace *> scan_angle_brackets <* tryScanInvisibleSpace <* scanString "\n"
+
+                full_directive_scan = scan_file_include <|> scan_lib_include
 
 
 ---------------------------------------------------------------------------------------------------

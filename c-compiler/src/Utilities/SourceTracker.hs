@@ -10,3 +10,6 @@ data SourceTracker  = SourceTracker {
                      , columnStart :: Int
                      , columnEnd   :: Int
                     }
+
+makeSourceTracker :: FilePath -> SourceTracker
+makeSourceTracker file_path = SourceTracker file_path 0 0 0 0

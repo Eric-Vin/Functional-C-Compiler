@@ -42,7 +42,10 @@ instance Show PreprocessorToken where
     show (Other value)                  = value
 
 -- | Datatype representing a Preprocessor Directive
-data PreprocessorDirective  = Include String
+data PreprocessorDirective  = Include IncludeType String
                             | Define String String
                             | Undefine String
                             deriving (Show)
+
+data IncludeType    = File | Library
+                    deriving (Show)

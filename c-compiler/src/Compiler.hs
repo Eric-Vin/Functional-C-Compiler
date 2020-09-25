@@ -14,4 +14,4 @@ compile file_path = undefined
 savePreprocessed :: FilePath -> FilePath -> IO ()
 savePreprocessed in_file_path out_file_path =   do
                                                     preprocessed_code <- preprocess in_file_path
-                                                    writeFile out_file_path (show preprocessed_code)
+                                                    writeFile out_file_path (show $ preprocessed_code)
