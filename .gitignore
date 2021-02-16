@@ -1,1 +1,4 @@
 stack.yaml.lock
+*.sublime-project
+*.sublime-workspace
+*.old
