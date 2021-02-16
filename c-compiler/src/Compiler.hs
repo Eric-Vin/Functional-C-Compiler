@@ -4,7 +4,7 @@ import Debug.Trace
 
 import Preprocessor.Preprocessor
 
-compile :: FilePath -> IO String
+compile :: FilePath -> FilePath -> IO ()
 compile file_path = undefined
 
 ---------------------------------------------------------------------------------------------------

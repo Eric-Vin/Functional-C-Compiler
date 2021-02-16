@@ -30,7 +30,7 @@ scanToken = scanDirective <|> scanPunctuator <|>
             scanStringLiteral <|> scanOther
 
 scanDirective :: Scanner PreprocessorToken
-scanDirective   = Directive <$> ((scanString "#") *> (scanInclude))
+scanDirective   = Directive <$> ((scanString "#") *> (scanInclude <|> scanDefine <|> scanUndefine))
 
 scanPunctuator :: Scanner PreprocessorToken
 scanPunctuator  = Punctuator <$> (asum $ map scanString punctuators_list)
@@ -57,8 +57,8 @@ scanPreprocessingNumber  = PreprocessingNumber <$> scan_optional_period
 scanStringLiteral :: Scanner PreprocessorToken
 scanStringLiteral   = StringLiteral <$> (scan_single_quote <|> scan_double_quote)
                     where
-                        scan_single_quote   = scanChar '\'' *>  (concat <$> many scan_single_quote_inner) <* scanChar '\''
-                        scan_double_quote   = scanChar '"'  *> (concat <$> many scan_double_quote_inner) <* scanChar '"'
+                        scan_single_quote   = (\x -> "'" ++ x ++ "'") <$> (scanChar '\'' *>  (concat <$> many scan_single_quote_inner) <* scanChar '\'')
+                        scan_double_quote   = (\x -> "\"" ++ x ++ "\"") <$> (scanChar '"'  *> (concat <$> many scan_double_quote_inner) <* scanChar '"')
 
                         scan_single_quote_inner = (scanString "\\'")   <|> scan_escape_sequences <|> (scanSpanChar $ getAll . ((All . (/= '\'')) <> (All . (/='\\'))))
                         scan_double_quote_inner = (scanString "\\\"")  <|> scan_escape_sequences <|> (scanSpanChar $ getAll . ((All . (/= '"'))  <> (All . (/='\\'))))
@@ -79,14 +79,6 @@ scanOther  = Other <$> scanSingle (const True)
 scanInclude :: Scanner PreprocessorDirective
 scanInclude =   (uncurry Include) <$> (Scanner $ scan)
             where
-                scan :: String -> Either CompilerError (String, (IncludeType, String)) 
-                scan input  =   if (isRight $ runScanner scan_directive_type input) && (isLeft $ runScanner full_directive_scan input)
-                                then
-                                    throwCompilerError $ PreprocessorError "Include directive was of incorrect form"
-                                else
-                                        ((\(x,y) -> (x, (File, y))) <$> runScanner scan_file_include input) 
-                                    <|> ((\(x,y) -> (x, (Library, y))) <$> runScanner scan_lib_include input)
-
                 scan_directive_type = scanString "include"
 
                 scan_string_inner_quote     = tryScanSpanChar (/= '"') 
@@ -100,6 +92,62 @@ scanInclude =   (uncurry Include) <$> (Scanner $ scan)
 
                 full_directive_scan = scan_file_include <|> scan_lib_include
 
+                scan :: String -> Either CompilerError (String, (IncludeType, String)) 
+                scan input  =   if (isRight $ runScanner scan_directive_type input) && (isLeft $ runScanner full_directive_scan input)
+                                then
+                                    throwCompilerError $ PreprocessorError "Include directive was of incorrect form"
+                                else
+                                        ((\(x,y) -> (x, (File, y))) <$> runScanner scan_file_include input) 
+                                    <|> ((\(x,y) -> (x, (Library, y))) <$> runScanner scan_lib_include input)
+
+-- | Attempts to scan a Define directive.
+-- | If it cannot scan a valid Define directive, returns a left value.
+scanDefine :: Scanner PreprocessorDirective
+scanDefine =   (uncurry Define) <$> (defineTokToString <$> (Scanner $ scan))
+            where
+                scan_directive_type = scanString "define"
+
+                -- | Scans all other tokens apart from a newline character and whitespace.
+                scan_other_define = Other <$> (scanSingle $ getAll . ((All . (/= '\n')) <> (All . (not . isSpace))))
+
+                scan_define_token = scanDirective <|> scanPunctuator <|> 
+                                    scanIdentifier <|> scanPreprocessingNumber <|> 
+                                    scanStringLiteral <|> scan_other_define
+
+                scan_define_tokens = (some (tryScanInvisibleSpace *> scan_define_token <* tryScanInvisibleSpace)) <* scanString "\n"
+
+                scan_define_identifier = (\x y -> (x, y)) <$> scanIdentifier <*> scan_define_tokens
+
+                full_directive_scan = scan_directive_type *> tryScanInvisibleSpace *> scan_define_identifier
+
+                scan :: String -> Either CompilerError (String, (PreprocessorToken, [PreprocessorToken]))
+                scan input  =   if (isRight $ runScanner scan_directive_type input) && (isLeft $ runScanner full_directive_scan input)
+                                then
+                                    throwCompilerError $ PreprocessorError "Define directive was of incorrect form"
+                                else
+                                    runScanner full_directive_scan input
+
+                defineTokToString :: (PreprocessorToken, [PreprocessorToken]) -> (String, [PreprocessorToken])
+                defineTokToString (Identifier macro, toks)  = (macro, toks) 
+
+-- | Attempts to scan a Define directive.
+-- | If it cannot scan a valid Define directive, returns a left value.
+scanUndefine :: Scanner PreprocessorDirective
+scanUndefine = Undefine <$> (undefineTokToString <$> (Scanner $ scan))
+            where
+                scan_directive_type = scanString "undef"
+
+                full_directive_scan = scan_directive_type *> tryScanInvisibleSpace *> scanIdentifier
+
+                scan :: String -> Either CompilerError (String, PreprocessorToken)
+                scan input  =   if (isRight $ runScanner scan_directive_type input) && (isLeft $ runScanner full_directive_scan input)
+                                then
+                                    throwCompilerError $ PreprocessorError "Undefine directive was of incorrect form"
+                                else
+                                    runScanner full_directive_scan input
+
+                undefineTokToString :: PreprocessorToken -> String
+                undefineTokToString (Identifier macro)  = (macro)
 
 ---------------------------------------------------------------------------------------------------
 -- | General Scanning Functons

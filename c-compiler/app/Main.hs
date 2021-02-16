@@ -5,10 +5,11 @@ import System.Environment
 import Compiler
 
 main :: IO ()
-main = do
-        args <- getArgs
-        compiled_code <- compile (head args)
-        putStrLn compiled_code
+main = undefined
+--         do
+--         args <- getArgs
+--         compiled_code <- compile (head args)
+--         putStrLn compiled_code
 
 ---------------------------------------------------------------------------------------------------
 --Command Line Argument Processing Functions and Datatypes

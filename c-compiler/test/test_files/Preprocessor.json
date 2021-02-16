@@ -57,9 +57,9 @@
     },
     {
     "Name"   : "Comment_Block_Simple",
-    "Input"  : "test/input/preprocessor/comment_line_simple.c",
-    "Output" : "test/output/preprocessor/comment_line_simple.pp",
-    "Golden" : "test/golden/preprocessor/comment_line_simple.pp",
+    "Input"  : "test/input/preprocessor/comment_block_simple.c",
+    "Output" : "test/output/preprocessor/comment_block_simple.pp",
+    "Golden" : "test/golden/preprocessor/comment_block_simple.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
     },
