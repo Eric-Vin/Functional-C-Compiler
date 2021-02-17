@@ -48,6 +48,38 @@
     "Error"  : "False"
     },
     {
+    "Name"   : "Continued_Line_Split_Whitespace",
+    "Input"  : "test/input/preprocessor/continued_line_split_whitespace.c",
+    "Output" : "test/output/preprocessor/continued_line_split_whitespace.pp",
+    "Golden" : "test/golden/preprocessor/continued_line_split_whitespace.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Continued_Line_Split_Comment_1",
+    "Input"  : "test/input/preprocessor/continued_line_split_comment_1.c",
+    "Output" : "test/output/preprocessor/continued_line_split_comment_1.pp",
+    "Golden" : "test/golden/preprocessor/continued_line_split_comment_1.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Continued_Line_Split_Comment_2",
+    "Input"  : "test/input/preprocessor/continued_line_split_comment_2.c",
+    "Output" : "test/output/preprocessor/continued_line_split_comment_2.pp",
+    "Golden" : "test/golden/preprocessor/continued_line_split_comment_2.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Continued_Line_Split_Complex",
+    "Input"  : "test/input/preprocessor/continued_line_split_complex.c",
+    "Output" : "test/output/preprocessor/continued_line_split_complex.pp",
+    "Golden" : "test/golden/preprocessor/continued_line_split_complex.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
     "Name"   : "Comment_Line_Simple",
     "Input"  : "test/input/preprocessor/comment_line_simple.c",
     "Output" : "test/output/preprocessor/comment_line_simple.pp",
@@ -144,6 +176,14 @@
     "Error"  : "False"
     },
     {
+    "Name"   : "Include_Split_Space",
+    "Input"  : "test/input/preprocessor/include_split_space/include_split_space.c",
+    "Output" : "test/output/preprocessor/include_split_space.pp",
+    "Golden" : "test/golden/preprocessor/include_split_space.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
     "Name"   : "Include_File_Single_Quotes",
     "Input"  : "test/input/preprocessor/include_file_single_quotes/include_file_single_quotes.c",
     "Output" : "test/output/preprocessor/include_file_single_quotes.pp",
@@ -155,6 +195,14 @@
     "Name"   : "Include_No_File",
     "Input"  : "test/input/preprocessor/include_no_file.c",
     "Output" : "test/output/preprocessor/include_no_file.pp",
+    "Golden" : "test/golden/error/error.err",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Include_No_Lib",
+    "Input"  : "test/input/preprocessor/include_no_lib.c",
+    "Output" : "test/output/preprocessor/include_no_lib.pp",
     "Golden" : "test/golden/error/error.err",
     "Type"   : "Preprocessor",
     "Error"  : "True"
@@ -264,6 +312,14 @@
     "Error"  : "False"
     },
     {
+    "Name"   : "Define_Split_Space",
+    "Input"  : "test/input/preprocessor/define_split_space.c",
+    "Output" : "test/output/preprocessor/define_split_space.pp",
+    "Golden" : "test/golden/preprocessor/define_split_space.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
     "Name"   : "Define_Invalid_Identifier",
     "Input"  : "test/input/preprocessor/define_invalid_identifier.c",
     "Output" : "test/output/preprocessor/define_invalid_identifier.pp",
@@ -294,5 +350,21 @@
     "Golden" : "test/golden/preprocessor/undefine_not_defined.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
+    },
+    {
+    "Name"   : "Undefine_Split_Space",
+    "Input"  : "test/input/preprocessor/undefine_split_space.c",
+    "Output" : "test/output/preprocessor/undefine_split_space.pp",
+    "Golden" : "test/golden/preprocessor/undefine_split_space.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Undefine_Invalid_Identifier",
+    "Input"  : "test/input/preprocessor/undefine_invalid_identifier.c",
+    "Output" : "test/output/preprocessor/undefine_invalid_identifier.pp",
+    "Golden" : "test/golden/preprocessor/undefine_invalid_identifier.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
     }
 ]

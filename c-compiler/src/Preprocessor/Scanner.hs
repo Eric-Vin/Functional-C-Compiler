@@ -30,7 +30,7 @@ scanToken = scanDirective <|> scanPunctuator <|>
             scanStringLiteral <|> scanOther
 
 scanDirective :: Scanner PreprocessorToken
-scanDirective   = Directive <$> ((scanString "#") *> (scanInclude <|> scanDefine <|> scanUndefine))
+scanDirective   = Directive <$> ((scanString "#") *> tryScanInvisibleSpace *> (scanInclude <|> scanDefine <|> scanUndefine))
 
 scanPunctuator :: Scanner PreprocessorToken
 scanPunctuator  = Punctuator <$> (asum $ map scanString punctuators_list)
@@ -153,15 +153,6 @@ scanUndefine = Undefine <$> (undefineTokToString <$> (Scanner $ scan))
 -- | General Scanning Functons
 ---------------------------------------------------------------------------------------------------
 
--- | Creates a Scanner that will attempt to scan a line continuation.
--- | Otherwise returns a Left value.
-scanBackslashNewline :: Scanner String
-scanBackslashNewline    = Scanner f
-                        where
-                            f i@('\\':'\n':xs)  = Right (xs, "\\\n")
-                            f i@(x:xs)          = Left $ PreprocessorError $ "Expected \"\\\n\" but got \"" ++ (take 2 i) ++ "\""
-                            f []                = Left $ PreprocessorError $ "Expected \"\\\n\" but reached end of input"
-
 -- | Creates a Scanner that will attempt to all whitespace and comments possible.
 -- | NOTE: This function never returns a Left value, only an empty list.
 tryScanInvisibleSpace :: Scanner String
@@ -187,8 +178,6 @@ scanComment  = scanLineComment <|> scanBlockComment
 -- | If nothing is scanned returns a Left value.
 scanWhitespace :: Scanner String
 scanWhitespace = scanSpanChar (getAll . ((All . isSpace) <> (All . (/='\n'))))
-
-
 
 
 -- | Creates a Scanner that will attempt to scan Chars as long as the passed function is 
@@ -227,29 +216,30 @@ scanString string = Scanner $ \input ->
 -- | satisfied by the remaining part of the list.
 -- | If nothing is scanned returns a left value.
 scanSpanString :: (String -> Bool) -> Scanner String
-scanSpanString f  = Scanner $ scan
+scanSpanString f  = (Scanner scan)
             where
                     scan :: String -> Either CompilerError (String, String)
                     scan input  | length token == 0   = Left $ PreprocessorError $ "\"" ++ (fst $ span (/= '\n') input) ++ "\" does not fulfill the scan function"
-                                | otherwise           = Right (input', token)
+                                | otherwise           = Right (input'', token)
                                 where
-                                    (input', token, rows, columns) = spanString f input
+                                    (input', trim_rows, trim_columns)           = trimContinue input
+                                    (input'', token, tok_rows, tok_columns)     = spanString f input'
 
                     spanString :: (String -> Bool) -> String -> (String, String, Int, Int)
                     spanString _ [] = ([],[], 0, 0)
-                    spanString func i@(x:xs)    | take 2 i == "\\\n"    = trimContinue
-                                                | func i                = (input', x:token, rows+row_inc, columns+col_inc)
+                    spanString func i@(x:xs)    | func input'           = (input'', (head input'):token, trim_rows+rows+row_inc, trim_columns+columns+col_inc)
                                                 | otherwise             = (i, [], 0, 0)
                                                 where 
-                                                    (input',token, rows, columns) = spanString func xs
+                                                    (input', trim_rows, trim_columns)   = trimContinue i
+                                                    (input'', token, rows, columns)     = spanString func (tail input')
 
                                                     row_inc = if (x == '\n') then 1 else 0
-                                                    col_inc = if (row_inc == 0) then 1 else 0  
+                                                    col_inc = if (row_inc == 0) then 1 else 0
 
-                                                    trimContinue :: (String, String, Int, Int)
-                                                    trimContinue    = (t_input, t_token, t_rows+1, t_colums+1)
-                                                                    where
-                                                                        (t_input, t_token, t_rows, t_colums) = spanString func (drop 2 i)
+                    trimContinue :: String -> (String, Int, Int)
+                    trimContinue input  = case runScanner scanBackslashNewline input of
+                                            Left _                              -> (input, 0, 0)
+                                            Right (rem_input, trimmed_input)    -> (rem_input, 1, (length trimmed_input) - 1)
 
 -- | Creates a Scanner that will attempt to scan a single Char if it fulfills the function passed. 
 -- | Otherwise returns a Left value.
@@ -272,6 +262,73 @@ scanChar char   = (many scanBackslashNewline) *> (Scanner f)
                         f (x:xs)    | x == char = Right (xs, x)
                                     | otherwise = Left $ PreprocessorError $ "Expected '" ++ [char] ++ "' but got '" ++ [x] ++ "'"
                         f []        = Left $ PreprocessorError $ "Expected '" ++ [char] ++ "' but reached end of input"
+
+-- | Creates a Scanner that will attempt to scan a line continuation.
+-- | Otherwise returns a Left value.
+-- | Note: This scanner does not depend on any other scanners, to avoid a circular dependency
+scanBackslashNewline :: Scanner String
+scanBackslashNewline    = (:) <$> (scanCharLim '\\' <* scanInvisibleSpaceLim) <*> ((:[]) <$> (scanCharLim '\n'))
+                        where
+                            scanInvisibleSpaceLim :: Scanner String
+                            scanInvisibleSpaceLim = concat <$> (many (scanWhitespaceLim <|> scanLineCommentLim <|> scanBlockCommentLim))
+
+                            scanWhitespaceLim :: Scanner String
+                            scanWhitespaceLim = scanSingleLim (\x -> (isSpace x) && (x /= '\n'))
+
+                            scanLineCommentLim :: Scanner String
+                            scanLineCommentLim  = (++) <$> scanLineCommentOpen <*> (concat <$> (many $ scanSingleLim (/= '\n')))
+                                                where
+                                                    scanLineCommentOpen :: Scanner String
+                                                    scanLineCommentOpen = (:) <$> (scanCharLim $ '/') <*> ((:[]) <$> (scanCharLim $ '/'))
+
+                            scanBlockCommentLim :: Scanner String
+                            scanBlockCommentLim = (++) <$> scanBlockCommentOpen <*> ((++) <$> scanBlockCommentInterior <*> scanBlockCommentClose)
+                                                where
+                                                    scanBlockCommentOpen :: Scanner String
+                                                    scanBlockCommentOpen = (:) <$> (scanCharLim $ '/') <*> ((:[]) <$> (scanCharLim $ '*'))
+
+                                                    scanBlockCommentClose :: Scanner String
+                                                    scanBlockCommentClose = (:) <$> (scanCharLim $ '*') <*> ((:[]) <$> (scanCharLim $ '/'))
+
+                                                    scanBlockCommentInterior :: Scanner String
+                                                    scanBlockCommentInterior    = scanSpanStringLim (\x -> (take 2 x) /= "*/")
+
+                            scanSpanStringLim :: (String -> Bool) -> Scanner String
+                            scanSpanStringLim f  = (Scanner scan)
+                                        where
+                                                scan :: String -> Either CompilerError (String, String)
+                                                scan input  | length token == 0   = Left $ PreprocessorError $ "\"" ++ (fst $ span (/= '\n') input) ++ "\" does not fulfill the scan function"
+                                                            | otherwise           = Right (input', token)
+                                                            where
+                                                                (input', token, tok_rows, tok_columns)     = spanString f input
+
+                                                spanString :: (String -> Bool) -> String -> (String, String, Int, Int)
+                                                spanString _ [] = ([],[], 0, 0)
+                                                spanString func i@(x:xs)    | func i                = (input', (head input'):token, rows+row_inc, columns+col_inc)
+                                                                            | otherwise             = (i, [], 0, 0)
+                                                                            where
+                                                                                (input', token, rows, columns)     = spanString func xs
+
+                                                                                row_inc = if (x == '\n') then 1 else 0
+                                                                                col_inc = if (row_inc == 0) then 1 else 0
+
+                            scanSingleLim :: (Char -> Bool) -> Scanner String
+                            scanSingleLim f = (Scanner scan)
+                                            where
+                                                scan :: String -> Either CompilerError (String, String)
+                                                scan []    = Left $ PreprocessorError $ "Empty input"
+                                                scan input = return_value
+                                                            where
+                                                                target_char  = head input
+                                                                return_value    | f target_char = Right $ (tail input, [target_char])
+                                                                                | otherwise     = Left $ PreprocessorError $ "'" ++ [target_char] ++ "' does not fulfill the scan function"
+
+                            scanCharLim :: Char -> Scanner Char
+                            scanCharLim char    = (Scanner f)
+                                                where
+                                                    f (x:xs)    | x == char = Right (xs, x)
+                                                                | otherwise = Left $ PreprocessorError $ "Expected '" ++ [char] ++ "' but got '" ++ [x] ++ "'"
+                                                    f []        = Left $ PreprocessorError $ "Expected '" ++ [char] ++ "' but reached end of input"
 
 ---------------------------------------------------------------------------------------------------
 -- | Scanner Datatypes
