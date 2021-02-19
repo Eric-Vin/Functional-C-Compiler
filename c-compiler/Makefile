@@ -1,11 +1,16 @@
 STACK = stack
 EXE   = c-compiler-exe
 
+TEST_NUM_THREADS = 8
+TEST_TIMEOUT= 5
+
 .PHONY: all
 
 .SILENT:
 
-all: build test
+all: build test_quiet
+
+verbose: build test
 
 build:
 	$(STACK) build
@@ -13,8 +18,11 @@ build:
 exec: build
 	$(STACK) exec $(EXE) $(target)
 
-test: build test_directories
-	$(STACK) test --test-arguments="--timeout=5 --num-threads 1"
+test: build
+	$(STACK) test --test-arguments="--timeout=$(TEST_TIMEOUT) --num-threads $(TEST_NUM_THREADS)"
+
+test_quiet: build
+	$(STACK) test --test-arguments="--timeout=$(TEST_TIMEOUT) --num-threads $(TEST_NUM_THREADS) --hide-successes"
 
 clean: clean_test
 	$(STACK) clean
@@ -24,7 +32,3 @@ purge: clean_test
 
 clean_test:
 	rm -rf test/output
-
-test_directories:
-	mkdir -p test/output
-	mkdir -p test/output/preprocessor

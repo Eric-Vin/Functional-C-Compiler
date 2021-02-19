@@ -2,7 +2,7 @@
     {
     "Name"   : "Continued_Line_Simple",
     "Input"  : "test/input/preprocessor/continued_line_simple.c",
-    "Output" : "test/output/preprocessor/continued_line_simple.pp",
+    "Output" : "test/output/preprocessor/continued_line_simple/continued_line_simple.pp",
     "Golden" : "test/golden/preprocessor/continued_line_simple.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -10,7 +10,7 @@
     {
     "Name"   : "Continued_Line_Complex",
     "Input"  : "test/input/preprocessor/continued_line_complex.c",
-    "Output" : "test/output/preprocessor/continued_line_complex.pp",
+    "Output" : "test/output/preprocessor/continued_line_complex/continued_line_complex.pp",
     "Golden" : "test/golden/preprocessor/continued_line_complex.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -18,7 +18,7 @@
     {
     "Name"   : "Continued_Line_Comment",
     "Input"  : "test/input/preprocessor/continued_line_comment.c",
-    "Output" : "test/output/preprocessor/continued_line_comment.pp",
+    "Output" : "test/output/preprocessor/continued_line_comment/continued_line_comment.pp",
     "Golden" : "test/golden/preprocessor/continued_line_comment.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -26,7 +26,7 @@
     {
     "Name"   : "Continued_Line_Include",
     "Input"  : "test/input/preprocessor/continued_line_include/continued_line_include.c",
-    "Output" : "test/output/preprocessor/continued_line_include.pp",
+    "Output" : "test/output/preprocessor/continued_line_include/continued_line_include.pp",
     "Golden" : "test/golden/preprocessor/continued_line_include.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -34,7 +34,7 @@
     {
     "Name"   : "Continued_Line_Define",
     "Input"  : "test/input/preprocessor/continued_line_define.c",
-    "Output" : "test/output/preprocessor/continued_line_define.pp",
+    "Output" : "test/output/preprocessor/continued_line_define/continued_line_define.pp",
     "Golden" : "test/golden/preprocessor/continued_line_define.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -42,7 +42,7 @@
     {
     "Name"   : "Continued_Line_Undefine",
     "Input"  : "test/input/preprocessor/continued_line_undefine.c",
-    "Output" : "test/output/preprocessor/continued_line_undefine.pp",
+    "Output" : "test/output/preprocessor/continued_line_undefine/continued_line_undefine.pp",
     "Golden" : "test/golden/preprocessor/continued_line_undefine.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -50,7 +50,7 @@
     {
     "Name"   : "Continued_Line_Split_Whitespace",
     "Input"  : "test/input/preprocessor/continued_line_split_whitespace.c",
-    "Output" : "test/output/preprocessor/continued_line_split_whitespace.pp",
+    "Output" : "test/output/preprocessor/continued_line_split_whitespace/continued_line_split_whitespace.pp",
     "Golden" : "test/golden/preprocessor/continued_line_split_whitespace.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -58,7 +58,7 @@
     {
     "Name"   : "Continued_Line_Split_Comment_1",
     "Input"  : "test/input/preprocessor/continued_line_split_comment_1.c",
-    "Output" : "test/output/preprocessor/continued_line_split_comment_1.pp",
+    "Output" : "test/output/preprocessor/continued_line_split_comment_1/continued_line_split_comment_1.pp",
     "Golden" : "test/golden/preprocessor/continued_line_split_comment_1.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -66,7 +66,7 @@
     {
     "Name"   : "Continued_Line_Split_Comment_2",
     "Input"  : "test/input/preprocessor/continued_line_split_comment_2.c",
-    "Output" : "test/output/preprocessor/continued_line_split_comment_2.pp",
+    "Output" : "test/output/preprocessor/continued_line_split_comment_2/continued_line_split_comment_2.pp",
     "Golden" : "test/golden/preprocessor/continued_line_split_comment_2.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -74,7 +74,7 @@
     {
     "Name"   : "Continued_Line_Split_Complex",
     "Input"  : "test/input/preprocessor/continued_line_split_complex.c",
-    "Output" : "test/output/preprocessor/continued_line_split_complex.pp",
+    "Output" : "test/output/preprocessor/continued_line_split_complex/continued_line_split_complex.pp",
     "Golden" : "test/golden/preprocessor/continued_line_split_complex.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -82,7 +82,7 @@
     {
     "Name"   : "Comment_Line_Simple",
     "Input"  : "test/input/preprocessor/comment_line_simple.c",
-    "Output" : "test/output/preprocessor/comment_line_simple.pp",
+    "Output" : "test/output/preprocessor/comment_line_simple/comment_line_simple.pp",
     "Golden" : "test/golden/preprocessor/comment_line_simple.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -90,7 +90,7 @@
     {
     "Name"   : "Comment_Block_Simple",
     "Input"  : "test/input/preprocessor/comment_block_simple.c",
-    "Output" : "test/output/preprocessor/comment_block_simple.pp",
+    "Output" : "test/output/preprocessor/comment_block_simple/comment_block_simple.pp",
     "Golden" : "test/golden/preprocessor/comment_block_simple.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -98,7 +98,7 @@
     {
     "Name"   : "Comment_Block_Multiple_Open",
     "Input"  : "test/input/preprocessor/comment_block_multiple_open.c",
-    "Output" : "test/output/preprocessor/comment_block_multiple_open.pp",
+    "Output" : "test/output/preprocessor/comment_block_multiple_open/comment_block_multiple_open.pp",
     "Golden" : "test/golden/preprocessor/comment_block_multiple_open.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -106,7 +106,7 @@
     {
     "Name"   : "Comment_Block_Multiple_Close",
     "Input"  : "test/input/preprocessor/comment_block_multiple_close.c",
-    "Output" : "test/output/preprocessor/comment_block_multiple_close.pp",
+    "Output" : "test/output/preprocessor/comment_block_multiple_close/comment_block_multiple_close.pp",
     "Golden" : "test/golden/preprocessor/comment_block_multiple_close.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -114,7 +114,7 @@
     {
     "Name"   : "Comment_Block_Nested",
     "Input"  : "test/input/preprocessor/comment_block_nested.c",
-    "Output" : "test/output/preprocessor/comment_block_nested.pp",
+    "Output" : "test/output/preprocessor/comment_block_nested/comment_block_nested.pp",
     "Golden" : "test/golden/preprocessor/comment_block_nested.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -122,7 +122,7 @@
     {
     "Name"   : "Comment_Nested_1",
     "Input"  : "test/input/preprocessor/comment_nested_1.c",
-    "Output" : "test/output/preprocessor/comment_nested_1.pp",
+    "Output" : "test/output/preprocessor/comment_nested_1/comment_nested_1.pp",
     "Golden" : "test/golden/preprocessor/comment_nested_1.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -130,7 +130,7 @@
     {
     "Name"   : "Comment_Nested_2",
     "Input"  : "test/input/preprocessor/comment_nested_2.c",
-    "Output" : "test/output/preprocessor/comment_nested_2.pp",
+    "Output" : "test/output/preprocessor/comment_nested_2/comment_nested_2.pp",
     "Golden" : "test/golden/preprocessor/comment_nested_2.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -138,7 +138,7 @@
     {
     "Name"   : "Comment_In_String_Literal",
     "Input"  : "test/input/preprocessor/comment_in_string_literal.c",
-    "Output" : "test/output/preprocessor/comment_in_string_literal.pp",
+    "Output" : "test/output/preprocessor/comment_in_string_literal/comment_in_string_literal.pp",
     "Golden" : "test/golden/preprocessor/comment_in_string_literal.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -146,7 +146,7 @@
     {
     "Name"   : "New_Line_EOF",
     "Input"  : "test/input/preprocessor/new_line_eof.c",
-    "Output" : "test/output/preprocessor/new_line_eof.pp",
+    "Output" : "test/output/preprocessor/new_line_eof/new_line_eof.pp",
     "Golden" : "test/golden/preprocessor/new_line_eof.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -154,7 +154,7 @@
     {
     "Name"   : "Include_File_Double_Quotes",
     "Input"  : "test/input/preprocessor/include_file_double_quotes/include_file_double_quotes.c",
-    "Output" : "test/output/preprocessor/include_file_double_quotes.pp",
+    "Output" : "test/output/preprocessor/include_file_double_quotes/include_file_double_quotes.pp",
     "Golden" : "test/golden/preprocessor/include_file_double_quotes.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -162,7 +162,7 @@
     {
     "Name"   : "Include_Lib",
     "Input"  : "test/input/preprocessor/include_lib.c",
-    "Output" : "test/output/preprocessor/include_lib.pp",
+    "Output" : "test/output/preprocessor/include_lib/include_lib.pp",
     "Golden" : "test/golden/preprocessor/include_lib.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -170,7 +170,7 @@
     {
     "Name"   : "Include_Space",
     "Input"  : "test/input/preprocessor/include_space/include_space.c",
-    "Output" : "test/output/preprocessor/include_space.pp",
+    "Output" : "test/output/preprocessor/include_space/include_space.pp",
     "Golden" : "test/golden/preprocessor/include_space.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -178,7 +178,7 @@
     {
     "Name"   : "Include_Split_Space",
     "Input"  : "test/input/preprocessor/include_split_space/include_split_space.c",
-    "Output" : "test/output/preprocessor/include_split_space.pp",
+    "Output" : "test/output/preprocessor/include_split_space/include_split_space.pp",
     "Golden" : "test/golden/preprocessor/include_split_space.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -186,47 +186,47 @@
     {
     "Name"   : "Include_File_Single_Quotes",
     "Input"  : "test/input/preprocessor/include_file_single_quotes/include_file_single_quotes.c",
-    "Output" : "test/output/preprocessor/include_file_single_quotes.pp",
-    "Golden" : "test/golden/error/error.err",
+    "Output" : "test/output/preprocessor/include_file_single_quotes/include_file_single_quotes.pp",
+    "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
     },
     {
     "Name"   : "Include_No_File",
     "Input"  : "test/input/preprocessor/include_no_file.c",
-    "Output" : "test/output/preprocessor/include_no_file.pp",
-    "Golden" : "test/golden/error/error.err",
+    "Output" : "test/output/preprocessor/include_no_file/include_no_file.pp",
+    "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
     },
     {
     "Name"   : "Include_No_Lib",
     "Input"  : "test/input/preprocessor/include_no_lib.c",
-    "Output" : "test/output/preprocessor/include_no_lib.pp",
-    "Golden" : "test/golden/error/error.err",
+    "Output" : "test/output/preprocessor/include_no_lib/include_no_lib.pp",
+    "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
     },
     {
     "Name"   : "Include_Invalid_Wrapper",
     "Input"  : "test/input/preprocessor/include_invalid_wrapper/include_invalid_wrapper.c",
-    "Output" : "test/output/preprocessor/include_invalid_wrapper.pp",
-    "Golden" : "test/golden/error/error.err",
+    "Output" : "test/output/preprocessor/include_invalid_wrapper/include_invalid_wrapper.pp",
+    "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
     },
     {
     "Name"   : "Include_Invalid_Params",
     "Input"  : "test/input/preprocessor/include_invalid_params/include_invalid_params.c",
-    "Output" : "test/output/preprocessor/include_invalid_params.pp",
-    "Golden" : "test/golden/error/error.err",
+    "Output" : "test/output/preprocessor/include_invalid_params/include_invalid_params.pp",
+    "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
     },
     {
     "Name"   : "Define_Simple_Identifier",
     "Input"  : "test/input/preprocessor/define_simple_identifier.c",
-    "Output" : "test/output/preprocessor/define_simple_identifier.pp",
+    "Output" : "test/output/preprocessor/define_simple_identifier/define_simple_identifier.pp",
     "Golden" : "test/golden/preprocessor/define_simple_identifier.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -234,7 +234,7 @@
     {
     "Name"   : "Define_Complex_Identifier",
     "Input"  : "test/input/preprocessor/define_complex_identifier.c",
-    "Output" : "test/output/preprocessor/define_complex_identifier.pp",
+    "Output" : "test/output/preprocessor/define_complex_identifier/define_complex_identifier.pp",
     "Golden" : "test/golden/preprocessor/define_complex_identifier.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -242,7 +242,7 @@
     {
     "Name"   : "Define_Text",
     "Input"  : "test/input/preprocessor/define_text.c",
-    "Output" : "test/output/preprocessor/define_text.pp",
+    "Output" : "test/output/preprocessor/define_text/define_text.pp",
     "Golden" : "test/golden/preprocessor/define_text.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -250,7 +250,7 @@
     {
     "Name"   : "Define_Decimal",
     "Input"  : "test/input/preprocessor/define_decimal.c",
-    "Output" : "test/output/preprocessor/define_decimal.pp",
+    "Output" : "test/output/preprocessor/define_decimal/define_decimal.pp",
     "Golden" : "test/golden/preprocessor/define_decimal.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -258,7 +258,7 @@
     {
     "Name"   : "Define_String_Single_Quotes",
     "Input"  : "test/input/preprocessor/define_string_single_quotes.c",
-    "Output" : "test/output/preprocessor/define_string_single_quotes.pp",
+    "Output" : "test/output/preprocessor/define_string_single_quotes/define_string_single_quotes.pp",
     "Golden" : "test/golden/preprocessor/define_string_single_quotes.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -266,7 +266,7 @@
     {
     "Name"   : "Define_String_Double_Quotes",
     "Input"  : "test/input/preprocessor/define_string_double_quotes.c",
-    "Output" : "test/output/preprocessor/define_string_double_quotes.pp",
+    "Output" : "test/output/preprocessor/define_string_double_quotes/define_string_double_quotes.pp",
     "Golden" : "test/golden/preprocessor/define_string_double_quotes.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -274,7 +274,7 @@
     {
     "Name"   : "Define_Token_List",
     "Input"  : "test/input/preprocessor/define_token_list.c",
-    "Output" : "test/output/preprocessor/define_token_list.pp",
+    "Output" : "test/output/preprocessor/define_token_list/define_token_list.pp",
     "Golden" : "test/golden/preprocessor/define_token_list.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -282,7 +282,7 @@
     {
     "Name"   : "Define_Sequential",
     "Input"  : "test/input/preprocessor/define_sequential.c",
-    "Output" : "test/output/preprocessor/define_sequential.pp",
+    "Output" : "test/output/preprocessor/define_sequential/define_sequential.pp",
     "Golden" : "test/golden/preprocessor/define_sequential.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -290,7 +290,7 @@
     {
     "Name"   : "Define_Nested",
     "Input"  : "test/input/preprocessor/define_nested.c",
-    "Output" : "test/output/preprocessor/define_nested.pp",
+    "Output" : "test/output/preprocessor/define_nested/define_nested.pp",
     "Golden" : "test/golden/preprocessor/define_nested.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -298,7 +298,7 @@
     {
     "Name"   : "Define_Nested_Redefine",
     "Input"  : "test/input/preprocessor/define_nested_redefine.c",
-    "Output" : "test/output/preprocessor/define_nested_redefine.pp",
+    "Output" : "test/output/preprocessor/define_nested_redefine/define_nested_redefine.pp",
     "Golden" : "test/golden/preprocessor/define_nested_redefine.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -306,7 +306,7 @@
     {
     "Name"   : "Define_Infinite_Recursive",
     "Input"  : "test/input/preprocessor/define_infinite_recursive.c",
-    "Output" : "test/output/preprocessor/define_infinite_recursive.pp",
+    "Output" : "test/output/preprocessor/define_infinite_recursive/define_infinite_recursive.pp",
     "Golden" : "test/golden/preprocessor/define_infinite_recursive.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -314,7 +314,7 @@
     {
     "Name"   : "Define_Split_Space",
     "Input"  : "test/input/preprocessor/define_split_space.c",
-    "Output" : "test/output/preprocessor/define_split_space.pp",
+    "Output" : "test/output/preprocessor/define_split_space/define_split_space.pp",
     "Golden" : "test/golden/preprocessor/define_split_space.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -322,15 +322,15 @@
     {
     "Name"   : "Define_Invalid_Identifier",
     "Input"  : "test/input/preprocessor/define_invalid_identifier.c",
-    "Output" : "test/output/preprocessor/define_invalid_identifier.pp",
-    "Golden" : "test/golden/error/error.err",
+    "Output" : "test/output/preprocessor/define_invalid_identifier/define_invalid_identifier.pp",
+    "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
     },
     {
     "Name"   : "Undefine_Simple_Identifier",
     "Input"  : "test/input/preprocessor/undefine_simple_identifier.c",
-    "Output" : "test/output/preprocessor/undefine_simple_identifier.pp",
+    "Output" : "test/output/preprocessor/undefine_simple_identifier/undefine_simple_identifier.pp",
     "Golden" : "test/golden/preprocessor/undefine_simple_identifier.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -338,7 +338,7 @@
     {
     "Name"   : "Undefine_Complex_Identifier",
     "Input"  : "test/input/preprocessor/undefine_complex_identifier.c",
-    "Output" : "test/output/preprocessor/undefine_complex_identifier.pp",
+    "Output" : "test/output/preprocessor/undefine_complex_identifier/undefine_complex_identifier.pp",
     "Golden" : "test/golden/preprocessor/undefine_complex_identifier.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -346,7 +346,7 @@
     {
     "Name"   : "Undefine_Not_Defined",
     "Input"  : "test/input/preprocessor/undefine_not_defined.c",
-    "Output" : "test/output/preprocessor/undefine_not_defined.pp",
+    "Output" : "test/output/preprocessor/undefine_not_defined/undefine_not_defined.pp",
     "Golden" : "test/golden/preprocessor/undefine_not_defined.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -354,7 +354,7 @@
     {
     "Name"   : "Undefine_Split_Space",
     "Input"  : "test/input/preprocessor/undefine_split_space.c",
-    "Output" : "test/output/preprocessor/undefine_split_space.pp",
+    "Output" : "test/output/preprocessor/undefine_split_space/undefine_split_space.pp",
     "Golden" : "test/golden/preprocessor/undefine_split_space.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
@@ -362,8 +362,8 @@
     {
     "Name"   : "Undefine_Invalid_Identifier",
     "Input"  : "test/input/preprocessor/undefine_invalid_identifier.c",
-    "Output" : "test/output/preprocessor/undefine_invalid_identifier.pp",
-    "Golden" : "test/golden/preprocessor/undefine_invalid_identifier.pp",
+    "Output" : "test/output/preprocessor/undefine_invalid_identifier/undefine_invalid_identifier.pp",
+    "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
     }

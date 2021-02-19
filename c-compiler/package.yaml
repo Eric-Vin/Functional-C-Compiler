@@ -51,9 +51,9 @@ tests:
     - c-compiler
     - tasty
     - tasty-golden
-    - tasty-expected-failure
+    - tasty-hunit
     - filepath
     - aeson
     - text
     - bytestring
-
+    - process

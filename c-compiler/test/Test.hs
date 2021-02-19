@@ -10,4 +10,5 @@ import TestCommon
 main :: IO ()
 main = do
         test_suite <- parseTestFiles
+        createOutputDirTree test_suite
         defaultMain $ generateTestSuite test_suite

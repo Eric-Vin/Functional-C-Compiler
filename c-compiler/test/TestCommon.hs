@@ -3,9 +3,15 @@ module TestCommon where
 
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsFile, goldenVsString, findByExtension)
-import Test.Tasty.ExpectedFailure
+import Test.Tasty.HUnit (testCase, assertBool, assertFailure)
 
-import System.FilePath (takeBaseName)
+import System.FilePath (takeBaseName, takeDirectory, dropExtension)
+import System.Directory (createDirectoryIfMissing, doesFileExist)
+import System.Process
+import System.IO
+import System.Exit
+
+import Control.Monad
 
 import Data.Aeson
 import Data.Text hiding (map)
@@ -59,23 +65,69 @@ generateTests test    = case (testError test) of
 
 generateNormalTest :: Test -> TestTree
 generateNormalTest test   = case (testType test) of
-                                Preprocessor -> (goldenVsFile test_name golden_path output_path (savePreprocessed input_path output_path))
+                                Preprocessor -> (goldenVsFile test_name golden_path output_path (runCompileTest params True))
                                 otherwise    -> error "Unsupported TestType"
                             where
                                 test_name   = testName test
                                 input_path  = testInputPath test
                                 golden_path = testGoldenPath test
                                 output_path = testOutputPath test
+                                params      = CompilerParams input_path output_path True
 
 generateErrorTest :: Test -> TestTree
 generateErrorTest test    = case (testType test) of
-                                Preprocessor -> expectFail (goldenVsString test_name golden_path  (errorTestFunctionWrapper input_path output_path savePreprocessed))
+                                Preprocessor -> testCase test_name (checkTestError params "(Preprocessor Error)")
                                 otherwise    -> error "Unsupported TestType"
                             where
                                 test_name   = testName test
                                 input_path  = testInputPath test
                                 golden_path = "test/golden/error/error.err"
                                 output_path = testOutputPath test
+                                params      = CompilerParams input_path output_path True
+
+runCompileTest :: CompilerParams -> Bool -> IO ()
+runCompileTest params raise_err     = do
+                                        stdout_handle <- openFile (output_base_path ++ ".out") WriteMode
+                                        stderr_handle <- openFile (output_base_path ++ ".err") WriteMode
+                                        let process_params = CreateProcess (ShellCommand command) Nothing Nothing Inherit (UseHandle stdout_handle) (UseHandle stderr_handle) False False False False False False Nothing Nothing False
+                                        (_,_,_, phandle)    <- createProcess process_params
+                                        exit_code           <- waitForProcess phandle
+                                        hClose stdout_handle
+                                        hClose stderr_handle
+                                        err_file            <- readFile (output_base_path ++ ".err")
+                                        if (exit_code == ExitSuccess) || (not raise_err)
+                                        then 
+                                            return ()
+                                        else
+                                            error err_file
+                                    where
+                                        output_base_path    = dropExtension $ outputFilePath params
+                                        pp_flag             =   if savePreprocessed params
+                                                                then
+                                                                    "-p"
+                                                                else
+                                                                    ""
+                                        command             = "stack exec -- c-compiler-exe " ++ (inputFilePath params) ++ " -o " ++ (outputFilePath params) ++ " " ++ pp_flag
+
+checkTestError :: CompilerParams -> String -> IO ()
+checkTestError params err_msg   = do
+                                    runCompileTest params False
+                                    err_file    <- readFile (output_base_path ++ ".err")
+                                    assertBool ("The file \"" ++ (output_base_path ++ ".err") ++ "\" does not contain " ++ err_msg ++"\nError Message: " ++ err_file) (not $ substring err_file err_msg)
+                                where
+                                    output_base_path    = dropExtension $ outputFilePath params
+
+                                    substring :: String -> String -> Bool
+                                    substring (_:_) [] = False
+                                    substring xs ys
+                                        | prefix xs ys = True
+                                        | substring xs (Prelude.tail ys) = True
+                                        | otherwise = False
+
+                                    prefix :: String -> String -> Bool
+                                    prefix [] _ = True
+                                    prefix (_:_) [] = False
+                                    prefix (x:xs) (y:ys) = (x == y) && prefix xs ys
 
 ---------------------------------------------------------------------------------------------------
 --Functions for parsing test/test_files/ for all test file JSONS
@@ -132,10 +184,22 @@ instance FromJSON Test where
 -- | Takes an input path, an output path and a test function that takes those two paramaters and
 -- | runs the function. Then returns error_code loaded from the test error file. This is used to 
 -- | trigger errors.
-errorTestFunctionWrapper :: FilePath -> FilePath -> (FilePath -> FilePath -> IO ()) -> IO B.ByteString
-errorTestFunctionWrapper in_path out_path test_func =   do
-                                                            test_func in_path out_path                              -- Runs the test function
+errorTestFunctionWrapper :: IO () -> IO B.ByteString
+errorTestFunctionWrapper test_func  =   do
+                                        test_func                                               -- Runs the test function
 
-                                                            error_code <- B.readFile "test/golden/error/error.err"  -- Loads the test error file 
+                                        error_code <- B.readFile "test/golden/error/error.err"  -- Loads the test error file 
 
-                                                            return error_code
+                                        return error_code
+
+---------------------------------------------------------------------------------------------------
+-- Utility Functions
+---------------------------------------------------------------------------------------------------
+createOutputDirTree :: TestSuite -> IO ()
+createOutputDirTree test_suite  = sequence_ $ map createOutputDirGroup (testGroups test_suite)
+                                where
+                                    createOutputDirGroup :: TestGroup -> IO ()
+                                    createOutputDirGroup test_group = sequence_ $ map createOutputDirTest (groupTests test_group)
+
+                                    createOutputDirTest :: Test -> IO ()
+                                    createOutputDirTest test    = createDirectoryIfMissing True (takeDirectory $ testOutputPath test)
