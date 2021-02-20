@@ -8,5 +8,4 @@ main :: IO ()
 main = do
         args    <- getArgs
         params  <- processArgs args
-        putStrLn $ show params
         compile params

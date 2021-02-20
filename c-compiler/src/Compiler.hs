@@ -50,7 +50,7 @@ processArgs args    = do
                                                                 "-p"        -> CompilerParams orig_input_file_path orig_output_path True
                                                                             where
                                                                                 (CompilerParams orig_input_file_path orig_output_path orig_save_preprocessed) = processFlags params args
-                                                                otherwise   -> error ("Argument Error: Unrecognized flag passed: \"" ++ arg ++ "\"")
+                                                                otherwise   -> error ("(Argument Error) Unrecognized flag passed: \"" ++ arg ++ "\"")
 
 cleanIOPaths :: CompilerParams -> IO CompilerParams
 cleanIOPaths old_params = do
@@ -59,7 +59,7 @@ cleanIOPaths old_params = do
                                                     then 
                                                         makeAbsolute orig_input_path
                                                     else
-                                                        error $ "Argument Error: The specified input file \"" ++ orig_input_path ++ "\" does not exist"
+                                                        error $ "(Argument Error) The specified input file \"" ++ orig_input_path ++ "\" does not exist"
                             new_out_file_path   <-  makeAbsolute orig_output_path
                             new_output_path <- makeAbsolute orig_output_path
                             return $ CompilerParams new_in_file_path new_out_file_path orig_save_preprocessed

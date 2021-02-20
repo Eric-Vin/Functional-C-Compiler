@@ -13,6 +13,8 @@ import System.Exit
 
 import Control.Monad
 
+import Debug.Trace
+
 import Data.Aeson
 import Data.Text hiding (map)
 import qualified Data.ByteString.Lazy as B
@@ -99,7 +101,7 @@ runCompileTest params raise_err     = do
                                         then 
                                             return ()
                                         else
-                                            error err_file
+                                            errorWithoutStackTrace err_file
                                     where
                                         output_base_path    = dropExtension $ outputFilePath params
                                         pp_flag             =   if savePreprocessed params
@@ -113,21 +115,10 @@ checkTestError :: CompilerParams -> String -> IO ()
 checkTestError params err_msg   = do
                                     runCompileTest params False
                                     err_file    <- readFile (output_base_path ++ ".err")
-                                    assertBool ("The file \"" ++ (output_base_path ++ ".err") ++ "\" does not contain " ++ err_msg ++"\nError Message: " ++ err_file) (not $ substring err_file err_msg)
+                                    let check_msg = (isInfixOf (pack err_msg) (pack err_file))
+                                    assertBool ("The file \"" ++ (output_base_path ++ ".err") ++ "\" does not contain " ++ err_msg ++"\nError Message: " ++ err_file) check_msg
                                 where
                                     output_base_path    = dropExtension $ outputFilePath params
-
-                                    substring :: String -> String -> Bool
-                                    substring (_:_) [] = False
-                                    substring xs ys
-                                        | prefix xs ys = True
-                                        | substring xs (Prelude.tail ys) = True
-                                        | otherwise = False
-
-                                    prefix :: String -> String -> Bool
-                                    prefix [] _ = True
-                                    prefix (_:_) [] = False
-                                    prefix (x:xs) (y:ys) = (x == y) && prefix xs ys
 
 ---------------------------------------------------------------------------------------------------
 --Functions for parsing test/test_files/ for all test file JSONS

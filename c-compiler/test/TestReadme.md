@@ -37,6 +37,7 @@ List of all tests and what they test
 
 * Define_Simple_Identifier          : Tests defining a simple identifier (Alphabetical all caps)
 * Define_Complex_Identifier         : Tests defining a complex identifier (Contains underscores, numbers and letters lower and upper case)
+* Define_Blank
 * Define_Text                       : Tests defining a macro as text
 * Define_Decimal                    : Tests defining a macro as a decimal number
 * Define_String_Single_Quotes       : Tests defining a macro as a string literal wrapped in ' '
@@ -55,26 +56,28 @@ List of all tests and what they test
 * Undefine_Split_Space              : Tests that an undefine directive with a space between the "#" and "undef" is interpreted correctly 
 * Undefine_Invalid_Identifier       : Tests that undefining an invalid identifier throws an error
 
-/ Ifdef_Simple                      : Tests a simple ifdef conditional
-/ Ifdef_Empty                       : Tests an ifdef conditional with no controlled text inside it
-/ Ifdef_Nested_Simple               : Tests 2 ifdef conditionals nested inside each other
-/ Ifdef_Nested_Complex              : Tests 4 ifdef conditionals nested inside each other
-/ Ifdef_Split_Space                 : Tests that an ifdef directive with a space between the "#" and "ifdef" is interpreted correctly 
-/ Ifdef_Multiple_Files              : Tests that an ifdef that is started in one file and ended in another throws an error
-/ Ifdef_Invalid_Identifier          : Tests that an ifdef with an invalid identifier throws an error
-/ Ifdef_Unmatched                   : Tests that an ifdef without a closing endif throws an error
-/ Ifdef_Nested_Unmatched            : Tests that 3 ifdef directives closed by 2 endif directives throws an error
-/ Ifdef_Invalid_Params              : Tests that an ifdef directive with an incorrect number of parameters throws an error
+* Ifdef_True                        : Tests a simple ifdef conditional that includes the controlled text
+* Ifdef_False                       : Tests a simple ifdef conditional that does not include the controlled text
+* Ifdef_Empty                       : Tests an ifdef conditional with no controlled text inside it
+* Ifdef_Nested_Simple               : Tests 2 ifdef conditionals nested inside each other
+* Ifdef_Nested_Complex              : Tests 4 ifdef conditionals nested inside each other
+* Ifdef_Split_Space                 : Tests that an ifdef directive with a space between the "#" and "ifdef" is interpreted correctly 
+* Ifdef_Multiple_Files              : Tests that an ifdef that is started in one file and ended in another throws an error
+* Ifdef_Invalid_Identifier          : Tests that an ifdef with an invalid identifier throws an error
+* Ifdef_Unmatched                   : Tests that an ifdef without a closing endif throws an error
+* Ifdef_Nested_Unmatched            : Tests that 3 ifdef directives closed by 2 endif directives throws an error
+* Ifdef_Invalid_Params              : Tests that an ifdef directive with an incorrect number of parameters throws an error
 
-/ Ifndef_Simple                     : Tests a simple ifndef conditional
-/ Ifndef_Empty                      : Tests an ifndef conditional with no controlled text inside it
-/ Ifndef_Nested_Simple              : Tests 2 ifndef conditionals nested inside each other
-/ Ifndef_Nested_Complex             : Tests 4 ifndef conditionals nested inside each other
-/ Ifndef_Split_Space                : Tests that an ifndef directive with a space between the "#" and "ifndef" is interpreted correctly 
-/ Ifndef_Multiple_Files             : Tests that an ifndef that is started in one file and ended in another throws an error
-/ Ifndef_Invalid_Identifier         : Tests that an ifndef with an invalid identifier throws an error
-/ Ifndef_Unmatched                  : Tests that an ifndef without a closing endif throws an error
-/ Ifndef_Nested_Unmatched           : Tests that 3 ifndef directives closed by 2 endif directives throws an error
-/ Ifndef_Invalid_Params             : Tests that an ifndef directive with an incorrect number of parameters throws an error
+* Ifndef_True                       : Tests a simple ifndef conditional that includes the controlled text
+* Ifndef_False                      : Tests a simple ifndef conditional that does not include the controlled text
+* Ifndef_Empty                      : Tests an ifndef conditional with no controlled text inside it
+* Ifndef_Nested_Simple              : Tests 2 ifndef conditionals nested inside each other
+* Ifndef_Nested_Complex             : Tests 4 ifndef conditionals nested inside each other
+* Ifndef_Split_Space                : Tests that an ifndef directive with a space between the "#" and "ifndef" is interpreted correctly 
+* Ifndef_Multiple_Files             : Tests that an ifndef that is started in one file and ended in another throws an error
+* Ifndef_Invalid_Identifier         : Tests that an ifndef with an invalid identifier throws an error
+* Ifndef_Unmatched                  : Tests that an ifndef without a closing endif throws an error
+* Ifndef_Nested_Unmatched           : Tests that 3 ifndef directives closed by 2 endif directives throws an error
+* Ifndef_Invalid_Params             : Tests that an ifndef directive with an incorrect number of parameters throws an error
 
 / Conditionals_No_Start             : Tests that an endif directive not preceded by a conditional directive throws an error

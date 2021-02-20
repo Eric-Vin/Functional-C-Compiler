@@ -232,6 +232,14 @@
     "Error"  : "False"
     },
     {
+    "Name"   : "Define_Blank",
+    "Input"  : "test/input/preprocessor/define_blank.c",
+    "Output" : "test/output/preprocessor/define_blank/define_blank.pp",
+    "Golden" : "test/golden/preprocessor/define_blank.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
     "Name"   : "Define_Complex_Identifier",
     "Input"  : "test/input/preprocessor/define_complex_identifier.c",
     "Output" : "test/output/preprocessor/define_complex_identifier/define_complex_identifier.pp",
@@ -363,6 +371,190 @@
     "Name"   : "Undefine_Invalid_Identifier",
     "Input"  : "test/input/preprocessor/undefine_invalid_identifier.c",
     "Output" : "test/output/preprocessor/undefine_invalid_identifier/undefine_invalid_identifier.pp",
+    "Golden" : "",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifdef_True",
+    "Input"  : "test/input/preprocessor/ifdef_true.c",
+    "Output" : "test/output/preprocessor/ifdef_true/ifdef_true.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_true.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifdef_False",
+    "Input"  : "test/input/preprocessor/ifdef_false.c",
+    "Output" : "test/output/preprocessor/ifdef_false/ifdef_false.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_false.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifdef_Empty",
+    "Input"  : "test/input/preprocessor/ifdef_empty.c",
+    "Output" : "test/output/preprocessor/ifdef_empty/ifdef_empty.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_empty.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifdef_Nested_Simple",
+    "Input"  : "test/input/preprocessor/ifdef_nested_simple.c",
+    "Output" : "test/output/preprocessor/ifdef_nested_simple/ifdef_nested_simple.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_nested_simple.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifdef_Nested_Complex",
+    "Input"  : "test/input/preprocessor/ifdef_nested_complex.c",
+    "Output" : "test/output/preprocessor/ifdef_nested_complex/ifdef_nested_complex.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_nested_complex.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifdef_Split_Space",
+    "Input"  : "test/input/preprocessor/ifdef_split_space.c",
+    "Output" : "test/output/preprocessor/ifdef_split_space/ifdef_split_space.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_split_space.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifdef_Multiple_Files",
+    "Input"  : "test/input/preprocessor/ifdef_multiple_files/ifdef_multiple_files.c",
+    "Output" : "test/output/preprocessor/ifdef_multiple_files/ifdef_multiple_files.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_multiple_files.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifdef_Invalid_Identifier",
+    "Input"  : "test/input/preprocessor/ifdef_invalid_identifier.c",
+    "Output" : "test/output/preprocessor/ifdef_invalid_identifier/ifdef_invalid_identifier.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_invalid_identifier.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifdef_Unmatched",
+    "Input"  : "test/input/preprocessor/ifdef_unmatched.c",
+    "Output" : "test/output/preprocessor/ifdef_unmatched/ifdef_unmatched.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_unmatched.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifdef_Nested_Unmatched",
+    "Input"  : "test/input/preprocessor/ifdef_nested_unmatched.c",
+    "Output" : "test/output/preprocessor/ifdef_nested_unmatched/ifdef_nested_unmatched.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_nested_unmatched.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifdef_Invalid_Params",
+    "Input"  : "test/input/preprocessor/ifdef_invalid_params.c",
+    "Output" : "test/output/preprocessor/ifdef_invalid_params/ifdef_invalid_params.pp",
+    "Golden" : "test/golden/preprocessor/ifdef_invalid_params.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifndef_True",
+    "Input"  : "test/input/preprocessor/ifndef_true.c",
+    "Output" : "test/output/preprocessor/ifndef_true/ifndef_true.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_true.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifndef_False",
+    "Input"  : "test/input/preprocessor/ifndef_false.c",
+    "Output" : "test/output/preprocessor/ifndef_false/ifndef_false.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_false.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifndef_Empty",
+    "Input"  : "test/input/preprocessor/ifndef_empty.c",
+    "Output" : "test/output/preprocessor/ifndef_empty/ifndef_empty.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_empty.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifndef_Nested_Simple",
+    "Input"  : "test/input/preprocessor/ifndef_nested_simple.c",
+    "Output" : "test/output/preprocessor/ifndef_nested_simple/ifndef_nested_simple.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_nested_simple.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifndef_Nested_Complex",
+    "Input"  : "test/input/preprocessor/ifndef_nested_complex.c",
+    "Output" : "test/output/preprocessor/ifndef_nested_complex/ifndef_nested_complex.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_nested_complex.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifndef_Split_Space",
+    "Input"  : "test/input/preprocessor/ifndef_split_space.c",
+    "Output" : "test/output/preprocessor/ifndef_split_space/ifndef_split_space.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_split_space.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Ifndef_Multiple_Files",
+    "Input"  : "test/input/preprocessor/ifndef_multiple_files/ifndef_multiple_files.c",
+    "Output" : "test/output/preprocessor/ifndef_multiple_files/ifndef_multiple_files.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_multiple_files.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifndef_Invalid_Identifier",
+    "Input"  : "test/input/preprocessor/ifndef_invalid_identifier.c",
+    "Output" : "test/output/preprocessor/ifndef_invalid_identifier/ifndef_invalid_identifier.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_invalid_identifier.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifndef_Unmatched",
+    "Input"  : "test/input/preprocessor/ifndef_unmatched.c",
+    "Output" : "test/output/preprocessor/ifndef_unmatched/ifndef_unmatched.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_unmatched.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifndef_Nested_Unmatched",
+    "Input"  : "test/input/preprocessor/ifndef_nested_unmatched.c",
+    "Output" : "test/output/preprocessor/ifndef_nested_unmatched/ifndef_nested_unmatched.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_nested_unmatched.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Ifndef_Invalid_Params",
+    "Input"  : "test/input/preprocessor/ifndef_invalid_params.c",
+    "Output" : "test/output/preprocessor/ifndef_invalid_params/ifndef_invalid_params.pp",
+    "Golden" : "test/golden/preprocessor/ifndef_invalid_params.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Conditionals_No_Start",
+    "Input"  : "test/input/preprocessor/conditionals_no_start.c",
+    "Output" : "test/output/preprocessor/conditionals_no_start/conditionals_no_start.pp",
     "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
