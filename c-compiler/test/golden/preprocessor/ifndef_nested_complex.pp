@@ -1,3 +1,3 @@
 int main ( ) { 
-return 3 + VAL2 ; 
+return 0 + 1 + 2 + VAL3 + 4 ; 
 } 

@@ -1,3 +1,3 @@
 int main ( ) { 
-return NUMBER + 4 ; 
+return 6 ; 
 } 

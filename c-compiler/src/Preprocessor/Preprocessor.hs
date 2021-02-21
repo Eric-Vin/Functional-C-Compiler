@@ -39,57 +39,80 @@ preprocessFile env file_path    = do
 applyDirectives :: PreprocessorEnv -> [PreprocessorToken] -> IO (PreprocessorEnv, [PreprocessorToken])
 applyDirectives env []                                  = return (env, [])
 applyDirectives env ((Directive dir):rem_tok)           = do
-                                                            (dir_env, dir_tok)                      <- applyDirective env dir
-                                                            (preprocessed_env, preprocessed_tok)    <- applyDirectives dir_env rem_tok
-                                                            return $ (preprocessed_env, dir_tok ++ preprocessed_tok)
+                                                            (dir_env, dir_tok)                      <- applyDirective env dir rem_tok
+                                                            (preprocessed_env, preprocessed_tok)    <- applyDirectives dir_env dir_tok
+                                                            return $ (preprocessed_env, preprocessed_tok)
 applyDirectives env toks                                = do
                                                             let (curr_tok, rem_tok) = applyMacros env toks
                                                             (preprocessed_env, preprocessed_tok) <- applyDirectives env rem_tok
                                                             return $ (preprocessed_env, curr_tok ++ preprocessed_tok)
 
 -- | Takes a single directive and applies it
-applyDirective :: PreprocessorEnv -> PreprocessorDirective -> IO (PreprocessorEnv, [PreprocessorToken])
-applyDirective env (Include File file)      = do 
-                                                let normalized_file = (dropFileName $ file_path) </> (file)
-                                                file_exists <- doesFileExist normalized_file
-                                                let target_file =   if file_exists 
-                                                                    then 
-                                                                        normalized_file 
-                                                                    else 
-                                                                        throwCompilerError $ PreprocessorError 
-                                                                        $ "Attempted to include the file (Original: \"" ++ file ++ 
-                                                                          "\" , Absolute:  \"" ++ normalized_file ++ 
-                                                                          "\") which does not exist."
-                                                preprocessFile env target_file
-                                            where
-                                                file_path = sourcePath $ st env
+applyDirective :: PreprocessorEnv -> PreprocessorDirective -> [PreprocessorToken] -> IO (PreprocessorEnv, [PreprocessorToken])
+applyDirective env (Include File file) toks      = do 
+                                                    let normalized_file = (dropFileName $ file_path) </> (file)
+                                                    file_exists <- doesFileExist normalized_file
+                                                    let target_file =   if file_exists 
+                                                                        then 
+                                                                            normalized_file 
+                                                                        else 
+                                                                            throwCompilerError $ PreprocessorError 
+                                                                            $ "Attempted to include the file (Original: \"" ++ file ++ 
+                                                                              "\" , Absolute:  \"" ++ normalized_file ++ 
+                                                                              "\") which does not exist."
+                                                    (preprocessed_env, preprocessor_toks) <- preprocessFile env target_file
+                                                    return (preprocessed_env, preprocessor_toks ++ toks)
+                                                where
+                                                    file_path = sourcePath $ st env
 
-applyDirective env (Include Library lib)    = do
-                                                let absolute_file = include_path </> (lib)
-                                                file_exists <- doesFileExist absolute_file
-                                                let target_file =   if file_exists 
-                                                                    then 
-                                                                        absolute_file 
-                                                                    else 
-                                                                        throwCompilerError $ PreprocessorError 
-                                                                        $ "Attempted to include the library (Original: \"" ++ lib ++ 
-                                                                          "\" , Absolute:  \"" ++ absolute_file ++ 
-                                                                          "\") which does not exist."
-                                                preprocessFile env target_file
+applyDirective env (Include Library lib) toks    = do
+                                                    let absolute_file = include_path </> (lib)
+                                                    file_exists <- doesFileExist absolute_file
+                                                    let target_file =   if file_exists 
+                                                                        then 
+                                                                            absolute_file 
+                                                                        else 
+                                                                            throwCompilerError $ PreprocessorError 
+                                                                            $ "Attempted to include the library (Original: \"" ++ lib ++ 
+                                                                              "\" , Absolute:  \"" ++ absolute_file ++ 
+                                                                              "\") which does not exist."
+                                                    (preprocessed_env, preprocessor_toks) <- preprocessFile env target_file
+                                                    return (preprocessed_env, preprocessor_toks ++ toks)
+                                                where
+                                                    include_path = case os of
+                                                        "linux" -> "/usr/include/"
 
-                                            where
-                                                include_path = case os of
-                                                    "linux" -> "/usr/include/"
+applyDirective env (Define id tokens) toks      = return (replaceEnvMacroEnv env new_menv, toks)
+                                                where
+                                                    old_menv = macro_env env
+                                                    new_menv = addDefineVal old_menv id tokens
 
-applyDirective env (Define id tokens)       = return (replaceEnvMacroEnv env new_menv, [])
-                                            where
-                                                old_menv = macro_env env
-                                                new_menv = addDefineVal old_menv id tokens
+applyDirective env (Undefine id) toks           = return (replaceEnvMacroEnv env new_menv, toks)
+                                                where
+                                                    old_menv = macro_env env
+                                                    new_menv = removeDefineVal old_menv id
 
-applyDirective env (Undefine id)            = return (replaceEnvMacroEnv env new_menv, [])
-                                            where
-                                                old_menv = macro_env env
-                                                new_menv = removeDefineVal old_menv id
+applyDirective env (Ifdef id) toks              = return (env, new_toks)
+                                                where
+                                                    menv = macro_env env
+                                                    conditional_val = isDefined menv id
+                                                    new_toks =  if conditional_val
+                                                                then
+                                                                    retainConditionalToks toks
+                                                                else
+                                                                    removeConditionalToks toks
+
+applyDirective env (Ifndef id) toks             = return (env, new_toks)
+                                                where
+                                                    menv = macro_env env
+                                                    conditional_val = not $ isDefined menv id
+                                                    new_toks =  if conditional_val
+                                                                then
+                                                                    retainConditionalToks toks
+                                                                else
+                                                                    removeConditionalToks toks
+
+applyDirective env (Endif) toks                 = throwCompilerError $ PreprocessorError "Reached EOF outside of conditional"
 
 -- | Takes a list or PreprocessorTokens applies a macro if the first token is a macro. 
 -- | Returns a tuple with the first element being the tokens that have been applied or 
@@ -106,3 +129,34 @@ applyMacros env toks    = case head toks of
                                                     trimmed_menv = removeDefineVal (macro_env env) id
                                                     trimmed_env = replaceEnvMacroEnv env trimmed_menv
                             otherwise -> ([head toks], tail toks)
+
+-- | Returns the tokens passed, including conditional text, with the next endif directive removed.
+retainConditionalToks :: [PreprocessorToken] -> [PreprocessorToken]
+retainConditionalToks toks = retainConditionalToksH toks 0
+                        where
+                            retainConditionalToksH :: [PreprocessorToken] -> Int -> [PreprocessorToken]
+                            retainConditionalToksH [] nf                                    = throwCompilerError $ PreprocessorError "Reached EOF without encountering #endif"
+                            retainConditionalToksH (tok@(Directive Endif):rem_toks) nf      =   if nf == 0
+                                                                                                    then
+                                                                                                        rem_toks
+                                                                                                    else
+                                                                                                        tok:(retainConditionalToksH rem_toks (nf - 1))
+                            retainConditionalToksH (tok@(Directive (Ifdef _)):rem_toks) nf  = tok:(retainConditionalToksH rem_toks (nf + 1))
+                            retainConditionalToksH (tok@(Directive (Ifndef _)):rem_toks) nf = tok:(retainConditionalToksH rem_toks (nf + 1))
+                            retainConditionalToksH (curr_tok:rem_toks) nf                   = curr_tok:(retainConditionalToksH rem_toks nf)
+
+-- | Returns the tokens passed, including conditional text, with the next endif directive removed.
+removeConditionalToks :: [PreprocessorToken] -> [PreprocessorToken]
+removeConditionalToks toks = removeConditionalToksH toks 0
+                        where
+                            removeConditionalToksH :: [PreprocessorToken] -> Int -> [PreprocessorToken]
+                            removeConditionalToksH [] nf                                = throwCompilerError $ PreprocessorError "Reached EOF without encountering #endif"
+                            removeConditionalToksH ((Directive Endif):rem_toks) nf      =   if nf == 0
+                                                                                            then
+                                                                                                rem_toks
+                                                                                            else
+                                                                                                (removeConditionalToksH rem_toks (nf - 1))
+                            removeConditionalToksH ((Directive (Ifdef _)):rem_toks) nf  = removeConditionalToksH rem_toks (nf + 1)
+                            removeConditionalToksH ((Directive (Ifndef _)):rem_toks) nf = removeConditionalToksH rem_toks (nf + 1)
+                            removeConditionalToksH (curr_tok:rem_toks) nf               = removeConditionalToksH rem_toks nf
+

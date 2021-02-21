@@ -2,7 +2,7 @@
 module TestCommon where 
 
 import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.Golden (goldenVsFile, goldenVsString, findByExtension)
+import Test.Tasty.Golden (goldenVsFile, goldenVsFileDiff, goldenVsString, findByExtension)
 import Test.Tasty.HUnit (testCase, assertBool, assertFailure)
 
 import System.FilePath (takeBaseName, takeDirectory, dropExtension)
@@ -67,7 +67,7 @@ generateTests test    = case (testError test) of
 
 generateNormalTest :: Test -> TestTree
 generateNormalTest test   = case (testType test) of
-                                Preprocessor -> (goldenVsFile test_name golden_path output_path (runCompileTest params True))
+                                Preprocessor -> (goldenVsFileDiff test_name (\ref new -> ["diff", "-u", ref, new]) golden_path output_path (runCompileTest params True))
                                 otherwise    -> error "Unsupported TestType"
                             where
                                 test_name   = testName test
@@ -115,8 +115,10 @@ checkTestError :: CompilerParams -> String -> IO ()
 checkTestError params err_msg   = do
                                     runCompileTest params False
                                     err_file    <- readFile (output_base_path ++ ".err")
-                                    let check_msg = (isInfixOf (pack err_msg) (pack err_file))
-                                    assertBool ("The file \"" ++ (output_base_path ++ ".err") ++ "\" does not contain " ++ err_msg ++"\nError Message: " ++ err_file) check_msg
+                                    let msg_exist_check = (not $ Prelude.null err_file)
+                                    assertBool ("The test did not throw an error.") msg_exist_check
+                                    let msg_val_check = (isInfixOf (pack err_msg) (pack err_file))
+                                    assertBool ("The file \"" ++ (output_base_path ++ ".err") ++ "\" does not contain " ++ err_msg ++"\nError Message: " ++ err_file) msg_val_check
                                 where
                                     output_base_path    = dropExtension $ outputFilePath params
 

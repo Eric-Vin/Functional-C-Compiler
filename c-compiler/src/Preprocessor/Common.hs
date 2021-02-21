@@ -49,6 +49,9 @@ instance Show PreprocessorToken where
 data PreprocessorDirective  = Include IncludeType String
                             | Define String [PreprocessorToken]
                             | Undefine String
+                            | Ifdef String
+                            | Ifndef String
+                            | Endif
                             deriving (Eq, Show)
 
 data IncludeType    = File | Library
