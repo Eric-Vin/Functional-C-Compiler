@@ -11,3 +11,5 @@ The Preprocessor supports the following directives:
 * "#include"
 * "#define" (Basic usage)
 * "#undef"
+* "ifdef", "ifndef"
+* "endif"

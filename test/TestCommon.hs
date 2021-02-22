@@ -2,18 +2,14 @@
 module TestCommon where 
 
 import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.Golden (goldenVsFile, goldenVsFileDiff, goldenVsString, findByExtension)
-import Test.Tasty.HUnit (testCase, assertBool, assertFailure)
+import Test.Tasty.Golden (goldenVsFileDiff, findByExtension)
+import Test.Tasty.HUnit (testCase, assertBool)
 
 import System.FilePath (takeBaseName, takeDirectory, dropExtension)
-import System.Directory (createDirectoryIfMissing, doesFileExist)
+import System.Directory (createDirectoryIfMissing)
 import System.Process
 import System.IO
 import System.Exit
-
-import Control.Monad
-
-import Debug.Trace
 
 import Data.Aeson
 import Data.Text hiding (map)
@@ -68,7 +64,7 @@ generateTests test    = case (testError test) of
 generateNormalTest :: Test -> TestTree
 generateNormalTest test   = case (testType test) of
                                 Preprocessor -> (goldenVsFileDiff test_name (\ref new -> ["diff", "-u", ref, new]) golden_path output_path (runCompileTest params True))
-                                otherwise    -> error "Unsupported TestType"
+                                _            -> error "Unsupported TestType"
                             where
                                 test_name   = testName test
                                 input_path  = testInputPath test
@@ -79,11 +75,10 @@ generateNormalTest test   = case (testType test) of
 generateErrorTest :: Test -> TestTree
 generateErrorTest test    = case (testType test) of
                                 Preprocessor -> testCase test_name (checkTestError params "(Preprocessor Error)")
-                                otherwise    -> error "Unsupported TestType"
+                                _            -> error "Unsupported TestType"
                             where
                                 test_name   = testName test
                                 input_path  = testInputPath test
-                                golden_path = "test/golden/error/error.err"
                                 output_path = testOutputPath test
                                 params      = CompilerParams input_path output_path True
 
@@ -136,8 +131,8 @@ parseTestFiles = do
 --Parses a test file and returns a TestGroup data type containing that information
 parseTestFile :: FilePath -> IO TestGroup
 parseTestFile file_path = do
-                            decode <- (eitherDecode <$> (getJSON file_path)) :: IO (Either String [Test])
-                            let tests = case decode of
+                            parsed_file <- (eitherDecode <$> (getJSON file_path)) :: IO (Either String [Test])
+                            let tests = case parsed_file of
                                             Left err -> error err
                                             Right test -> test
                             return (TestGroup (takeBaseName file_path) tests)
@@ -160,14 +155,14 @@ instance FromJSON Test where
     let testType = case stringTestType of
                         "Preprocessor" -> Preprocessor
                         "Output"       -> Output
-                        otherwise      -> error "Invalid testType value"
+                        _              -> error "Invalid testType value"
 
     errorTestType   <- o .: pack "Error"
 
     let testError = case errorTestType of
                         "True"         -> True
                         "False"        -> False
-                        otherwise      -> error "Invalid testError value"
+                        _              -> error "Invalid testError value"
 
     return Test{..}
 

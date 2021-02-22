@@ -4,8 +4,6 @@ import System.Directory
 import System.FilePath
 import System.Info (os)
 
-import Control.Monad.State.Lazy
-
 import Utilities.Error
 import Utilities.SourceTracker
 
@@ -28,12 +26,12 @@ preprocessFile env file_path    = do
                                     file_text <- readFile file_path
                                     let preprocessor_toks = ensureEOFNewline $ tokenize file_text
                                     let preprocessor_env = replaceEnvSourceTracker env (makeSourceTracker file_path)
-                                    applyDirectives env preprocessor_toks
+                                    applyDirectives preprocessor_env preprocessor_toks
                                 where
                                     ensureEOFNewline :: [PreprocessorToken] -> [PreprocessorToken]
                                     ensureEOFNewline toks = case last toks of
-                                                            Other "\n"  -> toks
-                                                            otherwise   -> toks ++ [Other "\n"]
+                                                                Other "\n"  -> toks
+                                                                _           -> toks ++ [Other "\n"]
 
 -- | Runs through a list of PreprocessorTokens and applies any directives in the list
 applyDirectives :: PreprocessorEnv -> [PreprocessorToken] -> IO (PreprocessorEnv, [PreprocessorToken])
@@ -63,7 +61,7 @@ applyDirective env (Include File file) toks      = do
                                                     (preprocessed_env, preprocessor_toks) <- preprocessFile env target_file
                                                     return (preprocessed_env, preprocessor_toks ++ toks)
                                                 where
-                                                    file_path = sourcePath $ st env
+                                                    file_path = sourcePath $ sourceTracker env
 
 applyDirective env (Include Library lib) toks    = do
                                                     let absolute_file = include_path </> (lib)
@@ -82,81 +80,81 @@ applyDirective env (Include Library lib) toks    = do
                                                     include_path = case os of
                                                         "linux" -> "/usr/include/"
 
-applyDirective env (Define id tokens) toks      = return (replaceEnvMacroEnv env new_menv, toks)
+applyDirective env (Define macro tokens) toks   = return (replaceEnvMacroEnv env new_menv, toks)
                                                 where
-                                                    old_menv = macro_env env
-                                                    new_menv = addDefineVal old_menv id tokens
+                                                    old_menv = macroEnv env
+                                                    new_menv = addDefineVal old_menv macro tokens
 
-applyDirective env (Undefine id) toks           = return (replaceEnvMacroEnv env new_menv, toks)
+applyDirective env (Undefine macro) toks        = return (replaceEnvMacroEnv env new_menv, toks)
                                                 where
-                                                    old_menv = macro_env env
-                                                    new_menv = removeDefineVal old_menv id
+                                                    old_menv = macroEnv env
+                                                    new_menv = removeDefineVal old_menv macro
 
-applyDirective env (Ifdef id) toks              = return (env, new_toks)
+applyDirective env (Ifdef macro) toks           = return (env, new_toks)
                                                 where
-                                                    menv = macro_env env
-                                                    conditional_val = isDefined menv id
+                                                    menv = macroEnv env
+                                                    conditional_val = isDefined menv macro
                                                     new_toks =  if conditional_val
                                                                 then
                                                                     retainConditionalToks toks
                                                                 else
                                                                     removeConditionalToks toks
 
-applyDirective env (Ifndef id) toks             = return (env, new_toks)
+applyDirective env (Ifndef macro) toks          = return (env, new_toks)
                                                 where
-                                                    menv = macro_env env
-                                                    conditional_val = not $ isDefined menv id
+                                                    menv = macroEnv env
+                                                    conditional_val = not $ isDefined menv macro
                                                     new_toks =  if conditional_val
                                                                 then
                                                                     retainConditionalToks toks
                                                                 else
                                                                     removeConditionalToks toks
 
-applyDirective env (Endif) toks                 = throwCompilerError $ PreprocessorError "Reached EOF outside of conditional"
+applyDirective _ (Endif) _                      = throwCompilerError $ PreprocessorError "Reached EOF outside of conditional"
 
 -- | Takes a list or PreprocessorTokens applies a macro if the first token is a macro. 
 -- | Returns a tuple with the first element being the tokens that have been applied or 
 -- | do not contain a macro and the second element being the remaining tokens.
 -- | NOTE: Takes a list of tokens instead of one to allow support for functional macros.
 applyMacros :: PreprocessorEnv -> [PreprocessorToken] -> ([PreprocessorToken], [PreprocessorToken])
-applyMacros env []              = ([], [])
+applyMacros _ []        = ([], [])
 applyMacros env toks    = case head toks of
-                            (Identifier id) ->  case getMacroVal (macro_env env) id of
+                            (Identifier macro)  ->  case getMacroVal (macroEnv env) macro of
                                                     Just mtoks  ->  let (nested_toks, nested_rem_toks) = applyMacros trimmed_env mtoks
                                                                     in (nested_toks ++ nested_rem_toks, tail toks)
                                                     Nothing     -> ([head toks], tail toks)
                                                 where
-                                                    trimmed_menv = removeDefineVal (macro_env env) id
+                                                    trimmed_menv = removeDefineVal (macroEnv env) macro
                                                     trimmed_env = replaceEnvMacroEnv env trimmed_menv
-                            otherwise -> ([head toks], tail toks)
+                            _                   -> ([head toks], tail toks)
 
 -- | Returns the tokens passed, including conditional text, with the next endif directive removed.
 retainConditionalToks :: [PreprocessorToken] -> [PreprocessorToken]
-retainConditionalToks toks = retainConditionalToksH toks 0
-                        where
-                            retainConditionalToksH :: [PreprocessorToken] -> Int -> [PreprocessorToken]
-                            retainConditionalToksH [] nf                                    = throwCompilerError $ PreprocessorError "Reached EOF without encountering #endif"
-                            retainConditionalToksH (tok@(Directive Endif):rem_toks) nf      =   if nf == 0
-                                                                                                    then
-                                                                                                        rem_toks
-                                                                                                    else
-                                                                                                        tok:(retainConditionalToksH rem_toks (nf - 1))
-                            retainConditionalToksH (tok@(Directive (Ifdef _)):rem_toks) nf  = tok:(retainConditionalToksH rem_toks (nf + 1))
-                            retainConditionalToksH (tok@(Directive (Ifndef _)):rem_toks) nf = tok:(retainConditionalToksH rem_toks (nf + 1))
-                            retainConditionalToksH (curr_tok:rem_toks) nf                   = curr_tok:(retainConditionalToksH rem_toks nf)
+retainConditionalToks toks  = retainConditionalToksH toks 0
+                            where
+                                retainConditionalToksH :: [PreprocessorToken] -> Int -> [PreprocessorToken]
+                                retainConditionalToksH [] _                                     = throwCompilerError $ PreprocessorError "Reached EOF without encountering #endif"
+                                retainConditionalToksH (tok@(Directive Endif):rem_toks) nf      =   if nf == 0
+                                                                                                        then
+                                                                                                            rem_toks
+                                                                                                        else
+                                                                                                            tok:(retainConditionalToksH rem_toks (nf - 1))
+                                retainConditionalToksH (tok@(Directive (Ifdef _)):rem_toks) nf  = tok:(retainConditionalToksH rem_toks (nf + 1))
+                                retainConditionalToksH (tok@(Directive (Ifndef _)):rem_toks) nf = tok:(retainConditionalToksH rem_toks (nf + 1))
+                                retainConditionalToksH (curr_tok:rem_toks) nf                   = curr_tok:(retainConditionalToksH rem_toks nf)
 
 -- | Returns the tokens passed, including conditional text, with the next endif directive removed.
 removeConditionalToks :: [PreprocessorToken] -> [PreprocessorToken]
-removeConditionalToks toks = removeConditionalToksH toks 0
-                        where
-                            removeConditionalToksH :: [PreprocessorToken] -> Int -> [PreprocessorToken]
-                            removeConditionalToksH [] nf                                = throwCompilerError $ PreprocessorError "Reached EOF without encountering #endif"
-                            removeConditionalToksH ((Directive Endif):rem_toks) nf      =   if nf == 0
-                                                                                            then
-                                                                                                rem_toks
-                                                                                            else
-                                                                                                (removeConditionalToksH rem_toks (nf - 1))
-                            removeConditionalToksH ((Directive (Ifdef _)):rem_toks) nf  = removeConditionalToksH rem_toks (nf + 1)
-                            removeConditionalToksH ((Directive (Ifndef _)):rem_toks) nf = removeConditionalToksH rem_toks (nf + 1)
-                            removeConditionalToksH (curr_tok:rem_toks) nf               = removeConditionalToksH rem_toks nf
+removeConditionalToks toks  = removeConditionalToksH toks 0
+                            where
+                                removeConditionalToksH :: [PreprocessorToken] -> Int -> [PreprocessorToken]
+                                removeConditionalToksH [] _                                 = throwCompilerError $ PreprocessorError "Reached EOF without encountering #endif"
+                                removeConditionalToksH ((Directive Endif):rem_toks) nf      =   if nf == 0
+                                                                                                then
+                                                                                                    rem_toks
+                                                                                                else
+                                                                                                    (removeConditionalToksH rem_toks (nf - 1))
+                                removeConditionalToksH ((Directive (Ifdef _)):rem_toks) nf  = removeConditionalToksH rem_toks (nf + 1)
+                                removeConditionalToksH ((Directive (Ifndef _)):rem_toks) nf = removeConditionalToksH rem_toks (nf + 1)
+                                removeConditionalToksH (_:rem_toks) nf                      = removeConditionalToksH rem_toks nf
 

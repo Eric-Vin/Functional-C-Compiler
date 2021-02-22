@@ -131,7 +131,7 @@ scanDefine =   (uncurry Define) <$> (defineTokToString <$> (Scanner $ scan))
                                     runScanner full_directive_scan input
 
                 defineTokToString :: (PreprocessorToken, [PreprocessorToken]) -> (String, [PreprocessorToken])
-                defineTokToString (Identifier macro, toks)  = (macro, toks) 
+                defineTokToString (Identifier macro, toks)  = (macro, toks)
 
 -- | Attempts to scan a Undefine directive.
 -- | If it cannot scan a valid Undefine directive, returns a left value.
@@ -193,7 +193,7 @@ scanIfndef   = Ifndef <$> (ifndefTokToString <$> (Scanner $ scan))
 -- | Attempts to scan an Endif directive.
 -- | If it cannot scan a valid Endif directive, returns a left value.
 scanEndif :: Scanner PreprocessorDirective
-scanEndif   = (\x -> Endif) <$> (Scanner $ scan)
+scanEndif   = (\_ -> Endif) <$> (Scanner $ scan)
             where
                 scan_directive_type = scanString "endif"
 
@@ -285,7 +285,7 @@ scanSpanString f  = (Scanner scan)
 
                     spanString :: (String -> Bool) -> String -> (String, String, Int, Int)
                     spanString _ [] = ([],[], 0, 0)
-                    spanString func i@(x:xs)    | func input'           = (input'', (head input'):token, trim_rows+rows+row_inc, trim_columns+columns+col_inc)
+                    spanString func i@(x:_)     | func input'           = (input'', (head input'):token, trim_rows+rows+row_inc, trim_columns+columns+col_inc)
                                                 | otherwise             = (i, [], 0, 0)
                                                 where 
                                                     (input', trim_rows, trim_columns)   = trimContinue i

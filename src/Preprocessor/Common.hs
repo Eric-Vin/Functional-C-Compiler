@@ -1,8 +1,5 @@
 module Preprocessor.Common where 
 
-import Data.List
-
-import Utilities.Error
 import Utilities.SourceTracker
 
 ---------------------------------------------------------------------------------------------------
@@ -60,53 +57,53 @@ data IncludeType    = File | Library
 -- | Datatype representing a Preprocessor Environment
 
 data PreprocessorEnv    = PreprocessorEnv {
-                            macro_env   :: MacroEnv ,
-                            st          :: SourceTracker
+                            macroEnv        :: MacroEnv ,
+                            sourceTracker   :: SourceTracker
                         } 
 
 replaceEnvSourceTracker :: PreprocessorEnv -> SourceTracker -> PreprocessorEnv
-replaceEnvSourceTracker env st  = PreprocessorEnv (macro_env env) st
+replaceEnvSourceTracker env st  = PreprocessorEnv (macroEnv env) st
 
 replaceEnvMacroEnv :: PreprocessorEnv -> MacroEnv -> PreprocessorEnv
-replaceEnvMacroEnv env menv = PreprocessorEnv menv (st env)
+replaceEnvMacroEnv env menv = PreprocessorEnv menv (sourceTracker env)
 
 type MacroEnv = [(String, [PreprocessorToken])]
 
 -- | Returns true if a macro using the String as an id is defined
 isDefined :: MacroEnv -> String -> Bool
-isDefined [] id                 = False
-isDefined ((macro,val):renv) id =   if macro == id
+isDefined [] _                  = False
+isDefined ((macro,_):renv) tid  =   if macro == tid
                                     then
                                         True
                                     else
-                                        isDefined renv id
+                                        isDefined renv tid
 
 -- | Returns Just val where val is the macro vaue if the macro is defined
 -- | and Nothing if the macro is undefined
 getMacroVal :: MacroEnv -> String -> Maybe [PreprocessorToken]
-getMacroVal [] id                   = Nothing
-getMacroVal ((macro,val):renv) id   =   if macro == id
+getMacroVal [] _                    = Nothing
+getMacroVal ((macro,val):renv) tid  =   if macro == tid
                                         then
                                             Just val
                                         else
-                                            getMacroVal renv id
+                                            getMacroVal renv tid
 
 -- | Adds a macro value to the macro environment. If the macro is already
 -- | defined, then the macro is redefined with the new value.
 addDefineVal :: MacroEnv -> String -> [PreprocessorToken] -> MacroEnv
-addDefineVal [] id new_val                  = [(id, new_val)]
-addDefineVal ((macro, val):renv) id new_val =   if macro == id
-                                                then
-                                                    (macro, new_val):renv
-                                                else
-                                                    (macro, val):(addDefineVal renv id new_val)
+addDefineVal [] tid new_val                     = [(tid, new_val)]
+addDefineVal ((macro, val):renv) tid new_val    =   if macro == tid
+                                                    then
+                                                        (macro, new_val):renv
+                                                    else
+                                                        (macro, val):(addDefineVal renv tid new_val)
 
 -- | Removes a macro value from this environment. Does nothing if the
 -- | macro is not defined in the environment.
 removeDefineVal :: MacroEnv -> String -> MacroEnv
-removeDefineVal [] id                   = []
-removeDefineVal ((macro, val):renv) id  =   if macro == id
+removeDefineVal [] _                    = []
+removeDefineVal ((macro, val):renv) tid =   if macro == tid
                                             then
                                                 renv
                                             else
-                                                (macro, val):(removeDefineVal renv id)
+                                                (macro, val):(removeDefineVal renv tid)

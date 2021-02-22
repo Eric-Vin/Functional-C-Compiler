@@ -41,16 +41,16 @@ processArgs args    = do
 
                         where
                             processFlags :: CompilerParams -> [String] -> CompilerParams
-                            processFlags params []          = params
-                            processFlags params (arg:args)  = case arg of
-                                                                "-o"        -> (CompilerParams orig_input_file_path new_output_path orig_save_preprocessed)
-                                                                            where
-                                                                                (CompilerParams orig_input_file_path orig_output_path orig_save_preprocessed) = processFlags params (tail args)
-                                                                                new_output_path = head args
-                                                                "-p"        -> CompilerParams orig_input_file_path orig_output_path True
-                                                                            where
-                                                                                (CompilerParams orig_input_file_path orig_output_path orig_save_preprocessed) = processFlags params args
-                                                                otherwise   -> error ("(Argument Error) Unrecognized flag passed: \"" ++ arg ++ "\"")
+                            processFlags params []              = params
+                            processFlags params (arg:rem_args)  = case arg of
+                                                                    "-o"        -> (CompilerParams orig_input_file_path new_output_path orig_save_preprocessed)
+                                                                                where
+                                                                                    (CompilerParams orig_input_file_path _ orig_save_preprocessed) = processFlags params (tail rem_args)
+                                                                                    new_output_path = head rem_args
+                                                                    "-p"        -> CompilerParams orig_input_file_path orig_output_path True
+                                                                                where
+                                                                                    (CompilerParams orig_input_file_path orig_output_path _) = processFlags params rem_args
+                                                                    _           -> error ("(Argument Error) Unrecognized flag passed: \"" ++ arg ++ "\"")
 
 cleanIOPaths :: CompilerParams -> IO CompilerParams
 cleanIOPaths old_params = do
@@ -61,7 +61,6 @@ cleanIOPaths old_params = do
                                                     else
                                                         error $ "(Argument Error) The specified input file \"" ++ orig_input_path ++ "\" does not exist"
                             new_out_file_path   <-  makeAbsolute orig_output_path
-                            new_output_path <- makeAbsolute orig_output_path
                             return $ CompilerParams new_in_file_path new_out_file_path orig_save_preprocessed
                         where
                             (CompilerParams orig_input_path orig_output_path orig_save_preprocessed) = old_params
