@@ -320,6 +320,54 @@
     "Error"  : "False"
     },
     {
+    "Name"   : "Define_Functional_Simple",
+    "Input"  : "test/input/preprocessor/define_functional_simple.c",
+    "Output" : "test/output/preprocessor/define_functional_simple/define_functional_simple.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_simple.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Functional_Complex",
+    "Input"  : "test/input/preprocessor/define_functional_complex.c",
+    "Output" : "test/output/preprocessor/define_functional_complex/define_functional_complex.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_complex.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Functional_Nested",
+    "Input"  : "test/input/preprocessor/define_functional_nested.c",
+    "Output" : "test/output/preprocessor/define_functional_nested/define_functional_nested.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_nested.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Min_Max",
+    "Input"  : "test/input/preprocessor/define_min_max.c",
+    "Output" : "test/output/preprocessor/define_min_max/define_min_max.pp",
+    "Golden" : "test/golden/preprocessor/define_min_max.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Functional_Parens_Split",
+    "Input"  : "test/input/preprocessor/define_functional_parens_split.c",
+    "Output" : "test/output/preprocessor/define_functional_parens_split/define_functional_parens_split.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_parens_split.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Functional_No_Parens",
+    "Input"  : "test/input/preprocessor/define_functional_no_parens.c",
+    "Output" : "test/output/preprocessor/define_functional_no_parens/define_functional_no_parens.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_no_parens.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
     "Name"   : "Define_Object_Split_Space",
     "Input"  : "test/input/preprocessor/define_object_split_space.c",
     "Output" : "test/output/preprocessor/define_object_split_space/define_object_split_space.pp",
@@ -328,9 +376,25 @@
     "Error"  : "False"
     },
     {
+    "Name"   : "Define_Functional_Split_Space",
+    "Input"  : "test/input/preprocessor/define_functional_split_space.c",
+    "Output" : "test/output/preprocessor/define_functional_split_space/define_functional_split_space.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_split_space.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
     "Name"   : "Define_Invalid_Identifier",
     "Input"  : "test/input/preprocessor/define_invalid_identifier.c",
     "Output" : "test/output/preprocessor/define_invalid_identifier/define_invalid_identifier.pp",
+    "Golden" : "",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Define_Functional_Duplicate_Param",
+    "Input"  : "test/input/preprocessor/define_functional_duplicate_param.c",
+    "Output" : "test/output/preprocessor/define_functional_duplicate_param/define_functional_duplicate_param.pp",
     "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"
@@ -348,6 +412,14 @@
     "Input"  : "test/input/preprocessor/undefine_complex_identifier.c",
     "Output" : "test/output/preprocessor/undefine_complex_identifier/undefine_complex_identifier.pp",
     "Golden" : "test/golden/preprocessor/undefine_complex_identifier.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Undefine_Functional",
+    "Input"  : "test/input/preprocessor/undefine_functional.c",
+    "Output" : "test/output/preprocessor/undefine_functional/undefine_functional.pp",
+    "Golden" : "test/golden/preprocessor/undefine_functional.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
     },
