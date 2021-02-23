@@ -80,10 +80,10 @@ applyDirective env (Include Library lib) toks    = do
                                                     include_path = case os of
                                                         "linux" -> "/usr/include/"
 
-applyDirective env (Define macro tokens) toks   = return (replaceEnvMacroEnv env new_menv, toks)
-                                                where
-                                                    old_menv = macroEnv env
-                                                    new_menv = addDefineVal old_menv macro tokens
+applyDirective env (ObjectDefine macro tokens) toks = return (replaceEnvMacroEnv env new_menv, toks)
+                                                    where
+                                                        old_menv = macroEnv env
+                                                        new_menv = addDefineVal old_menv macro tokens
 
 applyDirective env (Undefine macro) toks        = return (replaceEnvMacroEnv env new_menv, toks)
                                                 where

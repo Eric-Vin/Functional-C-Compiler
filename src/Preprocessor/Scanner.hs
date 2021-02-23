@@ -105,33 +105,45 @@ scanInclude =   (uncurry Include) <$> (Scanner $ scan)
 
 -- | Attempts to scan a Define directive.
 -- | If it cannot scan a valid Define directive, returns a left value.
+-- | NOTE: Order of scanning is important, as if scanObjectDefine cannot
+-- |       scan the directive it throws an error.
 scanDefine :: Scanner PreprocessorDirective
-scanDefine =   (uncurry Define) <$> (defineTokToString <$> (Scanner $ scan))
-            where
-                scan_directive_type = scanString "define"
+scanDefine = scanObjectDefine
 
-                -- | Scans all other tokens apart from a newline character and whitespace.
-                scan_other_define = Other <$> (scanSingle $ getAll . ((All . (/= '\n')) <> (All . (not . isSpace))))
+-- | Attempts to scan a Function-like Define directive.
+-- | If it cannot scan a valid Function-like Define directive, returns a left value.
+scanFunctionDefine :: Scanner PreprocessorDirective
+scanFunctionDefine  = undefined
 
-                scan_define_token = scanPunctuator <|> scanIdentifier <|>
-                                    scanPreprocessingNumber <|> scanStringLiteral <|>
-                                    scan_other_define
+-- | Attempts to scan an Object-like Define directive.
+-- | If it cannot scan a valid Object-like Define directive, returns a left value.
+scanObjectDefine :: Scanner PreprocessorDirective
+scanObjectDefine    =   (uncurry ObjectDefine) <$> (defineTokToString <$> (Scanner $ scan))
+                    where
+                        scan_directive_type = scanString "define"
 
-                scan_define_tokens = (many (tryScanInvisibleSpace *> scan_define_token <* tryScanInvisibleSpace)) <* scanString "\n"
+                        -- | Scans all other tokens apart from a newline character and whitespace.
+                        scan_other_define = Other <$> (scanSingle $ getAll . ((All . (/= '\n')) <> (All . (not . isSpace))))
 
-                scan_define_identifier = (\x y -> (x, y)) <$> scanIdentifier <*> scan_define_tokens
+                        scan_define_token = scanPunctuator <|> scanIdentifier <|>
+                                            scanPreprocessingNumber <|> scanStringLiteral <|>
+                                            scan_other_define
 
-                full_directive_scan = scan_directive_type *> tryScanInvisibleSpace *> scan_define_identifier
+                        scan_define_tokens = (many (tryScanInvisibleSpace *> scan_define_token <* tryScanInvisibleSpace)) <* scanString "\n"
 
-                scan :: String -> Either CompilerError (String, (PreprocessorToken, [PreprocessorToken]))
-                scan input  =   if (isRight $ runScanner scan_directive_type input) && (isLeft $ runScanner full_directive_scan input)
-                                then
-                                    throwCompilerError $ PreprocessorError "Define directive was of incorrect form"
-                                else
-                                    runScanner full_directive_scan input
+                        scan_define_identifier = (\x y -> (x, y)) <$> scanIdentifier <*> scan_define_tokens
 
-                defineTokToString :: (PreprocessorToken, [PreprocessorToken]) -> (String, [PreprocessorToken])
-                defineTokToString (Identifier macro, toks)  = (macro, toks)
+                        full_directive_scan = scan_directive_type *> tryScanInvisibleSpace *> scan_define_identifier
+
+                        scan :: String -> Either CompilerError (String, (PreprocessorToken, [PreprocessorToken]))
+                        scan input  =   if (isRight $ runScanner scan_directive_type input) && (isLeft $ runScanner full_directive_scan input)
+                                        then
+                                            throwCompilerError $ PreprocessorError "Define directive was of incorrect form"
+                                        else
+                                            runScanner full_directive_scan input
+
+                        defineTokToString :: (PreprocessorToken, [PreprocessorToken]) -> (String, [PreprocessorToken])
+                        defineTokToString (Identifier macro, toks)  = (macro, toks)
 
 -- | Attempts to scan a Undefine directive.
 -- | If it cannot scan a valid Undefine directive, returns a left value.

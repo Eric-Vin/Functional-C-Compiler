@@ -47,11 +47,19 @@ List of all tests and what they test
 * Define_Nested                     : Tests that nested macros expand properly
 * Define_Nested_Redefine            : Tests that nested macros that are redefined expand properly
 * Define_Infinite_Recursive         : Tests that recursively defined macros are applied only once and do not infinitely recurse
-* Define_Split_Space                : Tests that a define directive with a space between the "#" and "define" is interpreted correctly
+/ Define_Functional_Simple          : Tests a simple functional macro with one parameter
+/ Define_Functional_Complex         : Tests a more complex functional macro with multiple parameters
+/ Define_Functional_Nested          : Tests nested functional macros
+/ Define_Min_Max                    : Tests a somewhat complicated version of functional macros
+/ Define_Functional_Parens_Split    : Tests that a functional macro with a space between the macro name and the first parentheses is interpreted as an object macro
+/ Define_Functional_No_Parens       : Tests that a functional macro present without parentheses is treated like an undefined identifier
+* Define_Object_Split_Space         : Tests that an object-like define directive with a space between the "#" and "define" is interpreted correctly
+/ Define_Functional_Split_Space     : Tests that a function-like define directive with a space between the "#" and "define" is interpreted correctly
 * Define_Invalid_Identifier         : Tests that defining an invalid identifier throws an error
 
 * Undefine_Simple_Identifier        : Tests undefining a simple identifier (Alphabetical all caps)
 * Undefine_Complex_Identifier       : Tests undefining a complex identifier (Contains underscores, numbers and letters)
+/ Undefine_Functional               : Tests undefining a functional macro
 * Undefine_Not_Defined              : Tests that undefining a non defined identifier does nothing
 * Undefine_Split_Space              : Tests that an undefine directive with a space between the "#" and "undef" is interpreted correctly 
 * Undefine_Invalid_Identifier       : Tests that undefining an invalid identifier throws an error

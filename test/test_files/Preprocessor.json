@@ -320,10 +320,10 @@
     "Error"  : "False"
     },
     {
-    "Name"   : "Define_Split_Space",
-    "Input"  : "test/input/preprocessor/define_split_space.c",
-    "Output" : "test/output/preprocessor/define_split_space/define_split_space.pp",
-    "Golden" : "test/golden/preprocessor/define_split_space.pp",
+    "Name"   : "Define_Object_Split_Space",
+    "Input"  : "test/input/preprocessor/define_object_split_space.c",
+    "Output" : "test/output/preprocessor/define_object_split_space/define_object_split_space.pp",
+    "Golden" : "test/golden/preprocessor/define_object_split_space.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
     },

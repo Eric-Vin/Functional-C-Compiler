@@ -44,7 +44,8 @@ instance Show PreprocessorToken where
 
 -- | Datatype representing a Preprocessor Directive
 data PreprocessorDirective  = Include IncludeType String
-                            | Define String [PreprocessorToken]
+                            | ObjectDefine String [PreprocessorToken]
+                            | FunctionDefine
                             | Undefine String
                             | Ifdef String
                             | Ifndef String
