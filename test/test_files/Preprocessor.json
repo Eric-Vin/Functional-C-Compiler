@@ -344,6 +344,14 @@
     "Error"  : "False"
     },
     {
+    "Name"   : "Define_Functional_Empty_Params",
+    "Input"  : "test/input/preprocessor/define_functional_empty_params.c",
+    "Output" : "test/output/preprocessor/define_functional_empty_params/define_functional_empty_params.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_empty_params.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
     "Name"   : "Define_Min_Max",
     "Input"  : "test/input/preprocessor/define_min_max.c",
     "Output" : "test/output/preprocessor/define_min_max/define_min_max.pp",
@@ -360,10 +368,34 @@
     "Error"  : "False"
     },
     {
-    "Name"   : "Define_Functional_No_Parens",
-    "Input"  : "test/input/preprocessor/define_functional_no_parens.c",
-    "Output" : "test/output/preprocessor/define_functional_no_parens/define_functional_no_parens.pp",
-    "Golden" : "test/golden/preprocessor/define_functional_no_parens.pp",
+    "Name"   : "Define_Insert_Functional",
+    "Input"  : "test/input/preprocessor/define_insert_functional.c",
+    "Output" : "test/output/preprocessor/define_insert_functional/define_insert_functional.pp",
+    "Golden" : "test/golden/preprocessor/define_insert_functional.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Insert_Functional_Recursive",
+    "Input"  : "test/input/preprocessor/define_insert_functional_recursive.c",
+    "Output" : "test/output/preprocessor/define_insert_functional_recursive/define_insert_functional_recursive.pp",
+    "Golden" : "test/golden/preprocessor/define_insert_functional_recursive.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Mix_Object_Functional",
+    "Input"  : "test/input/preprocessor/define_mix_object_functional.c",
+    "Output" : "test/output/preprocessor/define_mix_object_functional/define_mix_object_functional.pp",
+    "Golden" : "test/golden/preprocessor/define_mix_object_functional.pp",
+    "Type"   : "Preprocessor",
+    "Error"  : "False"
+    },
+    {
+    "Name"   : "Define_Functional_No_Params",
+    "Input"  : "test/input/preprocessor/define_functional_no_params.c",
+    "Output" : "test/output/preprocessor/define_functional_no_params/define_functional_no_params.pp",
+    "Golden" : "test/golden/preprocessor/define_functional_no_params.pp",
     "Type"   : "Preprocessor",
     "Error"  : "False"
     },
@@ -395,6 +427,22 @@
     "Name"   : "Define_Functional_Duplicate_Param",
     "Input"  : "test/input/preprocessor/define_functional_duplicate_param.c",
     "Output" : "test/output/preprocessor/define_functional_duplicate_param/define_functional_duplicate_param.pp",
+    "Golden" : "",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Define_Functional_Too_Few_Params",
+    "Input"  : "test/input/preprocessor/define_functional_too_few_params.c",
+    "Output" : "test/output/preprocessor/define_functional_too_few_params/define_functional_too_few_params.pp",
+    "Golden" : "",
+    "Type"   : "Preprocessor",
+    "Error"  : "True"
+    },
+    {
+    "Name"   : "Define_Functional_Too_Many_Params",
+    "Input"  : "test/input/preprocessor/define_functional_too_many_params.c",
+    "Output" : "test/output/preprocessor/define_functional_too_many_params/define_functional_too_many_params.pp",
     "Golden" : "",
     "Type"   : "Preprocessor",
     "Error"  : "True"

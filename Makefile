@@ -1,7 +1,7 @@
 STACK = stack
 EXE   = c-compiler-exe
 
-TEST_NUM_THREADS = 8
+TEST_NUM_THREADS = 12
 TEST_TIMEOUT= 5
 
 .PHONY: all

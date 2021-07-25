@@ -1,3 +1,3 @@
 int main ( ) { 
-return MACRO ( 1 + 2 ) ; 
+return MACRO ( 1 , 2 ) ; 
 } 

@@ -39,7 +39,7 @@ scanPunctuator :: Scanner PreprocessorToken
 scanPunctuator  = Punctuator <$> (asum $ map scanString punctuators_list)
 
 scanIdentifier :: Scanner PreprocessorToken
-scanIdentifier  = Identifier <$> ((++) <$> scan_head_char <*> (concat <$> many scan_tail_char))
+scanIdentifier  = (\name -> Identifier name []) <$> ((++) <$> scan_head_char <*> (concat <$> many scan_tail_char))
                 where
                     scan_head_char = (scanSingle isLetter) <|> (scanString "_")
                     scan_tail_char =  scan_head_char <|> (scanSingle isDigit)
@@ -108,17 +108,51 @@ scanInclude =   (uncurry Include) <$> (Scanner $ scan)
 -- | NOTE: Order of scanning is important, as if scanObjectDefine cannot
 -- |       scan the directive it throws an error.
 scanDefine :: Scanner PreprocessorDirective
-scanDefine = scanObjectDefine
+scanDefine = scanFunctionDefine <|> scanObjectDefine
 
 -- | Attempts to scan a Function-like Define directive.
 -- | If it cannot scan a valid Function-like Define directive, returns a left value.
 scanFunctionDefine :: Scanner PreprocessorDirective
-scanFunctionDefine  = undefined
+scanFunctionDefine  = tupleToFunctionDefine <$> (functionDefineConvert <$> (Scanner $ scan))
+                    where
+                        scan_directive_type = scanString "define"
+
+                        -- | Scans all other tokens apart from a newline character and whitespace.
+                        scan_other_define = Other <$> (scanSingle $ getAll . ((All . (/= '\n')) <> (All . (not . isSpace))))
+
+                        scan_define_token = scanPunctuator <|> scanIdentifier <|>
+                                            scanPreprocessingNumber <|> scanStringLiteral <|>
+                                            scan_other_define
+
+                        scan_define_tokens = (some (tryScanInvisibleSpace *> scan_define_token <* tryScanInvisibleSpace)) <* scanString "\n"
+
+                        scan_define_tail_params = many ((scanString ",") *> tryScanInvisibleSpace *> scanIdentifier <* tryScanInvisibleSpace)
+
+                        try_scan_define_head_param = ((:[]) <$> (tryScanInvisibleSpace *> scanIdentifier <* tryScanInvisibleSpace)) <|> (pure [])
+
+                        scan_define_params = (scanString "(") *> ((++) <$> try_scan_define_head_param <*> scan_define_tail_params) <* (scanString ")")
+
+                        scan_define_identifier =  scan_directive_type *> tryScanInvisibleSpace *> scanIdentifier
+
+                        full_directive_scan = (\x y z -> (x, y, z)) <$> scan_define_identifier <*> scan_define_params <*> scan_define_tokens
+
+                        scan :: String -> Either CompilerError (String, (PreprocessorToken, [PreprocessorToken], [PreprocessorToken]))
+                        scan input  = runScanner full_directive_scan input
+
+                        functionDefineConvert :: (PreprocessorToken, [PreprocessorToken], [PreprocessorToken]) -> (String, [String], [PreprocessorToken])
+                        functionDefineConvert (Identifier macro _, params, toks)  = (macro, listIdentifiersToString params, toks)
+
+                        listIdentifiersToString :: [PreprocessorToken] -> [String]
+                        listIdentifiersToString []                              = []
+                        listIdentifiersToString ((Identifier macro _):rem_toks) = macro:(listIdentifiersToString rem_toks)
+
+                        tupleToFunctionDefine :: (String, [String], [PreprocessorToken]) -> PreprocessorDirective
+                        tupleToFunctionDefine (x,y,z) = FunctionDefine x y z
 
 -- | Attempts to scan an Object-like Define directive.
 -- | If it cannot scan a valid Object-like Define directive, returns a left value.
 scanObjectDefine :: Scanner PreprocessorDirective
-scanObjectDefine    =   (uncurry ObjectDefine) <$> (defineTokToString <$> (Scanner $ scan))
+scanObjectDefine    =   (uncurry ObjectDefine) <$> (objectDefineConvert <$> (Scanner $ scan))
                     where
                         scan_directive_type = scanString "define"
 
@@ -142,8 +176,8 @@ scanObjectDefine    =   (uncurry ObjectDefine) <$> (defineTokToString <$> (Scann
                                         else
                                             runScanner full_directive_scan input
 
-                        defineTokToString :: (PreprocessorToken, [PreprocessorToken]) -> (String, [PreprocessorToken])
-                        defineTokToString (Identifier macro, toks)  = (macro, toks)
+                        objectDefineConvert :: (PreprocessorToken, [PreprocessorToken]) -> (String, [PreprocessorToken])
+                        objectDefineConvert (Identifier macro _, toks)  = (macro, toks)
 
 -- | Attempts to scan a Undefine directive.
 -- | If it cannot scan a valid Undefine directive, returns a left value.
@@ -162,7 +196,7 @@ scanUndefine = Undefine <$> (undefineTokToString <$> (Scanner $ scan))
                                     runScanner full_directive_scan input
 
                 undefineTokToString :: PreprocessorToken -> String
-                undefineTokToString (Identifier macro)  = (macro)
+                undefineTokToString (Identifier macro _)  = (macro)
 
 -- | Attempts to scan an Ifdef directive.
 -- | If it cannot scan a valid Ifdef directive, returns a left value.
@@ -181,7 +215,7 @@ scanIfdef   = Ifdef <$> (ifdefTokToString <$> (Scanner $ scan))
                                     runScanner full_directive_scan input
 
                 ifdefTokToString :: PreprocessorToken -> String
-                ifdefTokToString (Identifier macro)  = macro
+                ifdefTokToString (Identifier macro _)  = macro
 
 -- | Attempts to scan an Ifndef directive.
 -- | If it cannot scan a valid Ifndef directive, returns a left value.
@@ -200,7 +234,7 @@ scanIfndef   = Ifndef <$> (ifndefTokToString <$> (Scanner $ scan))
                                     runScanner full_directive_scan input
 
                 ifndefTokToString :: PreprocessorToken -> String
-                ifndefTokToString (Identifier macro)  = macro
+                ifndefTokToString (Identifier macro _)  = macro
 
 -- | Attempts to scan an Endif directive.
 -- | If it cannot scan a valid Endif directive, returns a left value.

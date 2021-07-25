@@ -41,92 +41,121 @@ applyDirectives env ((Directive dir):rem_tok)           = do
                                                             (preprocessed_env, preprocessed_tok)    <- applyDirectives dir_env dir_tok
                                                             return $ (preprocessed_env, preprocessed_tok)
 applyDirectives env toks                                = do
-                                                            let (curr_tok, rem_tok) = applyMacros env toks
+                                                            let (curr_tok, rem_tok) = applyMacrosOnce (macroEnv env) toks
                                                             (preprocessed_env, preprocessed_tok) <- applyDirectives env rem_tok
-                                                            return $ (preprocessed_env, curr_tok ++ preprocessed_tok)
+                                                            return $ (preprocessed_env, curr_tok:preprocessed_tok)
 
 -- | Takes a single directive and applies it
 applyDirective :: PreprocessorEnv -> PreprocessorDirective -> [PreprocessorToken] -> IO (PreprocessorEnv, [PreprocessorToken])
-applyDirective env (Include File file) toks      = do 
-                                                    let normalized_file = (dropFileName $ file_path) </> (file)
-                                                    file_exists <- doesFileExist normalized_file
-                                                    let target_file =   if file_exists 
-                                                                        then 
-                                                                            normalized_file 
-                                                                        else 
-                                                                            throwCompilerError $ PreprocessorError 
-                                                                            $ "Attempted to include the file (Original: \"" ++ file ++ 
-                                                                              "\" , Absolute:  \"" ++ normalized_file ++ 
-                                                                              "\") which does not exist."
-                                                    (preprocessed_env, preprocessor_toks) <- preprocessFile env target_file
-                                                    return (preprocessed_env, preprocessor_toks ++ toks)
-                                                where
-                                                    file_path = sourcePath $ sourceTracker env
+applyDirective env (Include File file) toks                 = do 
+                                                                let normalized_file = (dropFileName $ file_path) </> (file)
+                                                                file_exists <- doesFileExist normalized_file
+                                                                let target_file =   if file_exists 
+                                                                                    then 
+                                                                                        normalized_file 
+                                                                                    else 
+                                                                                        throwCompilerError $ PreprocessorError 
+                                                                                        $ "Attempted to include the file (Original: \"" ++ file ++ 
+                                                                                          "\" , Absolute:  \"" ++ normalized_file ++ 
+                                                                                          "\") which does not exist."
+                                                                (preprocessed_env, preprocessor_toks) <- preprocessFile env target_file
+                                                                return (preprocessed_env, preprocessor_toks ++ toks)
+                                                            where
+                                                                file_path = sourcePath $ sourceTracker env
 
-applyDirective env (Include Library lib) toks    = do
-                                                    let absolute_file = include_path </> (lib)
-                                                    file_exists <- doesFileExist absolute_file
-                                                    let target_file =   if file_exists 
-                                                                        then 
-                                                                            absolute_file 
-                                                                        else 
-                                                                            throwCompilerError $ PreprocessorError 
-                                                                            $ "Attempted to include the library (Original: \"" ++ lib ++ 
-                                                                              "\" , Absolute:  \"" ++ absolute_file ++ 
-                                                                              "\") which does not exist."
-                                                    (preprocessed_env, preprocessor_toks) <- preprocessFile env target_file
-                                                    return (preprocessed_env, preprocessor_toks ++ toks)
-                                                where
-                                                    include_path = case os of
-                                                        "linux" -> "/usr/include/"
+applyDirective env (Include Library lib) toks               = do
+                                                                let absolute_file = include_path </> (lib)
+                                                                file_exists <- doesFileExist absolute_file
+                                                                let target_file =   if file_exists 
+                                                                                    then 
+                                                                                        absolute_file 
+                                                                                    else 
+                                                                                        throwCompilerError $ PreprocessorError 
+                                                                                        $ "Attempted to include the library (Original: \"" ++ lib ++ 
+                                                                                          "\" , Absolute:  \"" ++ absolute_file ++ 
+                                                                                          "\") which does not exist."
+                                                                (preprocessed_env, preprocessor_toks) <- preprocessFile env target_file
+                                                                return (preprocessed_env, preprocessor_toks ++ toks)
+                                                            where
+                                                                include_path = case os of
+                                                                    "linux" -> "/usr/include/"
 
-applyDirective env (ObjectDefine macro tokens) toks = return (replaceEnvMacroEnv env new_menv, toks)
-                                                    where
-                                                        old_menv = macroEnv env
-                                                        new_menv = addDefineVal old_menv macro tokens
+applyDirective env (ObjectDefine macro val) toks            = return (replaceEnvMacroEnv env new_menv, toks)
+                                                            where
+                                                                old_menv = macroEnv env
+                                                                new_menv = addObjectDefineVal old_menv macro val
+applyDirective env (FunctionDefine macro params val) toks   = return (replaceEnvMacroEnv env new_menv, toks)
+                                                            where
+                                                                old_menv = macroEnv env
+                                                                new_menv = addFunctionDefineVal old_menv macro params val
 
-applyDirective env (Undefine macro) toks        = return (replaceEnvMacroEnv env new_menv, toks)
-                                                where
-                                                    old_menv = macroEnv env
-                                                    new_menv = removeDefineVal old_menv macro
+applyDirective env (Undefine macro) toks                    = return (replaceEnvMacroEnv env new_menv, toks)
+                                                            where
+                                                                old_menv = macroEnv env
+                                                                new_menv = removeDefineVal old_menv macro
 
-applyDirective env (Ifdef macro) toks           = return (env, new_toks)
-                                                where
-                                                    menv = macroEnv env
-                                                    conditional_val = isDefined menv macro
-                                                    new_toks =  if conditional_val
-                                                                then
-                                                                    retainConditionalToks toks
-                                                                else
-                                                                    removeConditionalToks toks
+applyDirective env (Ifdef macro) toks                       = return (env, new_toks)
+                                                            where
+                                                                menv = macroEnv env
+                                                                conditional_val = isDefined menv macro
+                                                                new_toks =  if conditional_val
+                                                                            then
+                                                                                retainConditionalToks toks
+                                                                            else
+                                                                                removeConditionalToks toks
 
-applyDirective env (Ifndef macro) toks          = return (env, new_toks)
-                                                where
-                                                    menv = macroEnv env
-                                                    conditional_val = not $ isDefined menv macro
-                                                    new_toks =  if conditional_val
-                                                                then
-                                                                    retainConditionalToks toks
-                                                                else
-                                                                    removeConditionalToks toks
+applyDirective env (Ifndef macro) toks                      = return (env, new_toks)
+                                                            where
+                                                                menv = macroEnv env
+                                                                conditional_val = not $ isDefined menv macro
+                                                                new_toks =  if conditional_val
+                                                                            then
+                                                                                retainConditionalToks toks
+                                                                            else
+                                                                                removeConditionalToks toks
 
-applyDirective _ (Endif) _                      = throwCompilerError $ PreprocessorError "Reached EOF outside of conditional"
+applyDirective _ (Endif) _                                  = throwCompilerError $ PreprocessorError "Reached EOF outside of conditional"
 
--- | Takes a list or PreprocessorTokens applies a macro if the first token is a macro. 
--- | Returns a tuple with the first element being the tokens that have been applied or 
--- | do not contain a macro and the second element being the remaining tokens.
+-- | Takes a list of PreprocessorTokens and expands the first token until it can no longer be expanded.
+-- | Returns a tuple with the first element being the first token in its expanded form and the second
+-- | element being the remaining tokens.
 -- | NOTE: Takes a list of tokens instead of one to allow support for functional macros.
-applyMacros :: PreprocessorEnv -> [PreprocessorToken] -> ([PreprocessorToken], [PreprocessorToken])
-applyMacros _ []        = ([], [])
-applyMacros env toks    = case head toks of
-                            (Identifier macro)  ->  case getMacroVal (macroEnv env) macro of
-                                                    Just mtoks  ->  let (nested_toks, nested_rem_toks) = applyMacros trimmed_env mtoks
-                                                                    in (nested_toks ++ nested_rem_toks, tail toks)
-                                                    Nothing     -> ([head toks], tail toks)
-                                                where
-                                                    trimmed_menv = removeDefineVal (macroEnv env) macro
-                                                    trimmed_env = replaceEnvMacroEnv env trimmed_menv
-                            _                   -> ([head toks], tail toks)
+applyMacrosOnce :: MacroEnv -> [PreprocessorToken] -> (PreprocessorToken, [PreprocessorToken])
+applyMacrosOnce _ []        = error "Cannot apply macros to an empty list of PreprocessorTokens."
+applyMacrosOnce env toks    = case isExpandable env (head toks) of
+                                True    -> applyMacrosOnce env new_toks
+                                        where
+                                            Identifier mid _ = head toks
+                                            Just macro_map = getMacroVal env mid
+                                            new_toks = applyMacro macro_map toks
+                                False   -> (head toks, tail toks)
+                            where
+                                -- | Returns true if a macro using the String value in the Identifier is
+                                -- | defined and the Identifier does not have itself as a parent.
+                                -- | Note that since only an Identifier is expandable, any other PreprocessorToken
+                                -- | being passed results in false.
+                                isExpandable :: MacroEnv -> PreprocessorToken -> Bool
+                                isExpandable env (Identifier name parents)  = (isDefined env name) && (not $ elem name parents)
+                                isExpandable _ _                            = False
+
+                                applyMacro :: MacroMap -> [PreprocessorToken] -> [PreprocessorToken]
+                                applyMacro (ObjectMap mid mtoks) toks   = new_toks
+                                                                        where
+                                                                            Identifier name parents = head toks
+                                                                            new_toks = (setParentList (mid:parents) mtoks) ++ tail toks
+
+                                setParentList :: [String] -> [PreprocessorToken] -> [PreprocessorToken]
+                                setParentList _ []                                              = []
+                                setParentList new_parents ((Identifier name _):rem_toks)        = new_identifier:(setParentList new_parents rem_toks)
+                                                                                                    where
+                                                                                                        new_identifier = Identifier name (new_parents)
+                                setParentList new_parents (toks:rem_toks)                       = toks:(setParentList new_parents rem_toks)
+
+-- | Takes a list of PreprocessorTokens and applies macro expansion to the whole list of tokens
+-- | Returns a list of tokens that have been fully expanded
+-- applyMacrosExhaustive :: MacroEnv -> [PreprocessorToken] -> [PreprocessorToken]
+-- applyMacrosExhaustive _ []      = []
+-- applyMacrosExhaustive env toks  = 
 
 -- | Returns the tokens passed, including conditional text, with the next endif directive removed.
 retainConditionalToks :: [PreprocessorToken] -> [PreprocessorToken]
@@ -143,7 +172,7 @@ retainConditionalToks toks  = retainConditionalToksH toks 0
                                 retainConditionalToksH (tok@(Directive (Ifndef _)):rem_toks) nf = tok:(retainConditionalToksH rem_toks (nf + 1))
                                 retainConditionalToksH (curr_tok:rem_toks) nf                   = curr_tok:(retainConditionalToksH rem_toks nf)
 
--- | Returns the tokens passed, including conditional text, with the next endif directive removed.
+-- | Returns the tokens passed, without conditional text, with the next endif directive removed.
 removeConditionalToks :: [PreprocessorToken] -> [PreprocessorToken]
 removeConditionalToks toks  = removeConditionalToksH toks 0
                             where

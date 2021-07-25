@@ -26,9 +26,12 @@ instance Show PreprocessedFile where
                     fileConcat (x:xs)           = x ++ " " ++ (fileConcat xs)
 
 -- | Datatype representing one Preprocessor token
+-- | The Identifier token also contains a list of macro
+-- | expansions it has been a part of to prevent infinite
+-- | recursive expansion of macros.
 data PreprocessorToken  = Directive PreprocessorDirective
                         | Punctuator String
-                        | Identifier String
+                        | Identifier String [String]
                         | PreprocessingNumber String
                         | StringLiteral String
                         | Other String
@@ -37,7 +40,7 @@ data PreprocessorToken  = Directive PreprocessorDirective
 instance Show PreprocessorToken where
     show (Directive directive)          = show directive
     show (Punctuator value)             = value
-    show (Identifier value)             = value
+    show (Identifier value _)           = value
     show (PreprocessingNumber value)    = value
     show (StringLiteral value)          = value
     show (Other value)                  = value
@@ -45,7 +48,7 @@ instance Show PreprocessorToken where
 -- | Datatype representing a Preprocessor Directive
 data PreprocessorDirective  = Include IncludeType String
                             | ObjectDefine String [PreprocessorToken]
-                            | FunctionDefine
+                            | FunctionDefine String [String] [PreprocessorToken]
                             | Undefine String
                             | Ifdef String
                             | Ifndef String
@@ -68,43 +71,58 @@ replaceEnvSourceTracker env st  = PreprocessorEnv (macroEnv env) st
 replaceEnvMacroEnv :: PreprocessorEnv -> MacroEnv -> PreprocessorEnv
 replaceEnvMacroEnv env menv = PreprocessorEnv menv (sourceTracker env)
 
-type MacroEnv = [(String, [PreprocessorToken])]
+type MacroEnv   = [MacroMap]
+
+data MacroMap   = ObjectMap String [PreprocessorToken]
+                | FunctionMap String [String] [PreprocessorToken]
+
+-- | Returns Just val where val is the macro string if the macro is defined
+-- | and Nothing if the macro is undefined
+getMacroName :: MacroMap -> String
+getMacroName (ObjectMap macro _)        = macro
+getMacroName (FunctionMap macro _ _)    = macro
+
+-- | Returns Just val where val is the macro value if the macro is defined
+-- | and Nothing if the macro is undefined.
+getMacroVal :: MacroEnv -> String -> Maybe MacroMap
+getMacroVal [] _                = Nothing
+getMacroVal (m:renv) t_macro    =   if (getMacroName m) == t_macro
+                                    then
+                                        Just m
+                                    else
+                                        getMacroVal renv t_macro
 
 -- | Returns true if a macro using the String as an id is defined
 isDefined :: MacroEnv -> String -> Bool
-isDefined [] _                  = False
-isDefined ((macro,_):renv) tid  =   if macro == tid
-                                    then
-                                        True
-                                    else
-                                        isDefined renv tid
+isDefined env macro = case getMacroVal env macro of
+                        Nothing -> False
+                        Just _  -> True
 
--- | Returns Just val where val is the macro vaue if the macro is defined
--- | and Nothing if the macro is undefined
-getMacroVal :: MacroEnv -> String -> Maybe [PreprocessorToken]
-getMacroVal [] _                    = Nothing
-getMacroVal ((macro,val):renv) tid  =   if macro == tid
-                                        then
-                                            Just val
-                                        else
-                                            getMacroVal renv tid
-
--- | Adds a macro value to the macro environment. If the macro is already
+-- | Adds an object macro to the macro environment. If the macro is already
 -- | defined, then the macro is redefined with the new value.
-addDefineVal :: MacroEnv -> String -> [PreprocessorToken] -> MacroEnv
-addDefineVal [] tid new_val                     = [(tid, new_val)]
-addDefineVal ((macro, val):renv) tid new_val    =   if macro == tid
+addObjectDefineVal :: MacroEnv -> String -> [PreprocessorToken] -> MacroEnv
+addObjectDefineVal [] macro val         = [ObjectMap macro val]
+addObjectDefineVal (m:renv) macro val   =   if (getMacroName m) == macro
+                                            then
+                                                (ObjectMap macro val):renv
+                                            else
+                                                m:(addObjectDefineVal renv macro val)
+
+
+addFunctionDefineVal :: MacroEnv -> String -> [String] -> [PreprocessorToken] -> MacroEnv
+addFunctionDefineVal [] macro params val       = [FunctionMap macro params val]
+addFunctionDefineVal (m:renv) macro params val =   if (getMacroName m) == macro
                                                     then
-                                                        (macro, new_val):renv
+                                                        (FunctionMap macro params val):renv
                                                     else
-                                                        (macro, val):(addDefineVal renv tid new_val)
+                                                        m:(addFunctionDefineVal renv macro params val)
 
 -- | Removes a macro value from this environment. Does nothing if the
 -- | macro is not defined in the environment.
 removeDefineVal :: MacroEnv -> String -> MacroEnv
-removeDefineVal [] _                    = []
-removeDefineVal ((macro, val):renv) tid =   if macro == tid
-                                            then
-                                                renv
-                                            else
-                                                (macro, val):(removeDefineVal renv tid)
+removeDefineVal [] _            = []
+removeDefineVal (m:renv) macro  =   if (getMacroName m) == macro
+                                    then
+                                        renv
+                                    else
+                                        m:(removeDefineVal renv macro)
